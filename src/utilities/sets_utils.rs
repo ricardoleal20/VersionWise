@@ -27,7 +27,7 @@ pub fn write_changeset_file(changeset: &Changeset) {
     let mut message = String::new();
 
     // Initialize the separator
-    let separator = "-".repeat(35) + "\n";
+    let separator = "=".repeat(35) + "\n";
     // Start adding it a line of 10 `-`
     message.push_str(&separator);
     message.push_str(&format!("\t{}\n", &changeset.change));

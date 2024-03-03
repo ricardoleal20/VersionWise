@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+fake = { version = "2.9.2", features = ["derive"] }
 clap = "^2.0.0"
 pyo3 = "0.20.3"
 regex = "1.10.3"

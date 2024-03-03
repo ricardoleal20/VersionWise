@@ -1,4 +1,3 @@
-use regex::Regex;
 /// ================================ ///
 ///         OPTIONS :: Create        ///
 /// ================================ ///
@@ -7,6 +6,9 @@ use regex::Regex;
 /// * P2: Select the type of versioning change (major, minor, patch)
 /// * P3: Search for the available modules in the package. If not found, let them write their own module name
 /// * P4: Write the message to add in the changeset
+use fake::faker::lorem::en::Word;
+use fake::Fake;
+use regex::Regex;
 use requestty::{prompt, Question};
 // Local imports
 use crate::options::Changeset;
@@ -64,7 +66,7 @@ fn process_answers() -> Changeset {
     // ** Name
     let mut name = result.get("name").unwrap().as_string().unwrap();
     if name == default_name {
-        name = "WRITE A FAKER FOR NAMES.rs"
+        name = Word().fake();
     }
     // Check if there's a name
     // ** Change type
@@ -107,4 +109,6 @@ pub fn create_changesets() {
     create_changeset_folder();
     // Once you have created the folder, create the changeset
     write_changeset_file(&changeset);
+    // Once you have created it, print a confirmation message
+    println!("\n Changeset `{}.md` has been created! 🎉", changeset.name);
 }
