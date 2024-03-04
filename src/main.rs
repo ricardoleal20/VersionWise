@@ -5,7 +5,7 @@ use clap::{App, ArgMatches};
 mod options;
 mod utilities;
 // Use the methods from the modules
-use options::create_changesets;
+use options::{bump_version, create_changesets, list_changesets};
 use utilities::create_subcommands;
 
 fn main() {
@@ -29,10 +29,12 @@ fn main() {
         // List
         ("list", Some(_)) => {
             // Instance the app method
+            list_changesets()
         }
         // Bump
         ("bump", Some(_)) => {
             // Instance the app method
+            bump_version()
         }
         _ => {
             // Manejar casos inesperados o mostrar ayuda por defecto
