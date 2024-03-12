@@ -30,7 +30,7 @@ pub fn write_changeset_file(changeset: &Changeset) {
     let separator = "=".repeat(35) + "\n";
     // Start adding it a line of 10 `-`
     message.push_str(&separator);
-    message.push_str(&format!("\t{}\n", &changeset.change));
+    message.push_str(&format!("\t{}:{}\n", &changeset.change, &changeset.tag));
     message.push_str(&separator);
     // Write the message and the module, if it exists
     if !changeset.module.is_empty() {

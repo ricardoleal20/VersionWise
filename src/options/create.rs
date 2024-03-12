@@ -9,10 +9,69 @@
 use fake::faker::lorem::en::Word;
 use fake::Fake;
 use regex::Regex;
-use requestty::{prompt, Question};
+use requestty::{prompt, prompt_one, Question};
 // Local imports
 use crate::options::Changeset;
 use crate::utilities::{create_changeset_folder, write_changeset_file};
+
+/// Select tags depending on the change type
+fn select_tags(change_type: &str) -> Vec<String> {
+    let available_tags: Vec<String>;
+    // Based on the change type representation, select the tags.
+    if change_type == "MAJOR" {
+        available_tags = vec![
+            String::from("⚰️ Remove: Removed features."),
+            String::from("🚚 Rename: Renamed features."),
+            String::from("✏️ I/O: Changing input/output of features."),
+            String::from("💥 Behavior: Changing features behavior."),
+        ];
+    } else if change_type == "MINOR" {
+        available_tags = vec![
+            String::from("✨ Feature: New feature."),
+            String::from("➕ Add: Add functionality to existing feature."),
+            String::from("✏️ I/O: Include optional input/output to a feature."),
+            String::from("🗑️ Deprecated: Deprecated features."),
+        ];
+    } else {
+        available_tags = vec![
+            String::from("♻️ Refactor: Refactor of existing code."),
+            String::from("🐛 Bug: Fix a bug."),
+            String::from("⚡️ Optimization: Simple optimization of code."),
+            String::from("🧪 Tests: Include or update tests."),
+            String::from("🩹 Patch: Include or delete logs, catch errors or related things."),
+        ];
+    }
+    // Return the selected tags
+    available_tags
+}
+
+/// Create the question to set the tag
+fn set_tag(change_type: &str) -> String {
+    // Get the available tags
+    let available_tags = select_tags(change_type);
+    // Create the question
+    let tag_question = Question::select("tag")
+        .message("Select the tag for this change")
+        .choices(available_tags)
+        .build();
+    // Perform the question
+    let results = prompt_one(tag_question);
+    let result = match results {
+        // Check and receive the OK, if there's any
+        Ok(x) => x,
+        Err(_) => panic!("There's something wrong selecting the tag for the changeset"),
+    };
+    // And, at the end, just receive the answer
+    let mut tag = result.as_list_item().unwrap().text.as_str();
+    // And now, clean the tag
+    let re = Regex::new(r"([A-Za-z]+):").unwrap();
+    if let Some(capture) = re.captures(&tag) {
+        if let Some(matched) = capture.get(1) {
+            tag = matched.as_str();
+        }
+    }
+    tag.to_string()
+}
 
 /// Create the questions
 fn create_questions(default_name: &str) -> Vec<Question<'static>> {
@@ -90,13 +149,14 @@ fn process_answers() -> Changeset {
     // ** message for change
     let message = result.get("message").unwrap().as_string().unwrap();
     if message.is_empty() {
-        panic!("There was no message for the changeset. You should add one.")
+        panic!("There was no message for the changeset. You need to add one.")
     }
     // Return the results
     Changeset {
         name: name.into(),
         change: change.into(),
         module: module.into(),
+        tag: set_tag(change),
         message: message.into(),
     }
 }
