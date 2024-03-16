@@ -6,6 +6,7 @@
 /// * P2: Select the type of versioning change (major, minor, patch)
 /// * P3: Search for the available modules in the package. If not found, let them write their own module name
 /// * P4: Write the message to add in the changeset
+use colored::*;
 use fake::faker::lorem::en::Word;
 use fake::Fake;
 use regex::Regex;
@@ -170,5 +171,8 @@ pub fn create_changesets() {
     // Once you have created the folder, create the changeset
     write_changeset_file(&changeset);
     // Once you have created it, print a confirmation message
-    println!("\n Changeset `{}.md` has been created! 🎉", changeset.name);
+    println!(
+        "\n Changeset `{}.md` has been created! 🎉",
+        changeset.name.green()
+    );
 }
