@@ -120,27 +120,27 @@ pub fn update_version(changes: &Vec<Changeset>, version: String) -> String {
         .collect();
 
     // Find the maximum change type in the list of changes
-    let mut max_change = 'N'; // Default value representing no changes
+    let mut max_change = 'P'; // Default value representing no changes
     for changeset in changes {
-        if changeset.change == "MAJOR" {
+        if changeset.change.contains("MAJOR") {
             max_change = 'M';
+            // Since there's no other higher option, we'll choose
+            // this as the maximum change type and break the iteration here
             break;
-        } else if changeset.change == "MINOR" && max_change != 'M' {
+        } else if changeset.change.contains("MINOR") && max_change != 'M' {
             max_change = 'N'; // Reset to 'N' if no MAJOR change found
-        } else if changeset.change == "PATCH" && max_change == 'N' {
+        } else if changeset.change.contains("PATCH") && max_change != 'N' {
             max_change = 'P';
         }
     }
-
     // Update the version based on the maximum change type
     let mut updated_version = current_version.clone();
     match max_change {
         'M' => updated_version[0] += 1,
-        'P' => updated_version[1] += 1,
-        'N' => updated_version[2] += 1,
+        'N' => updated_version[1] += 1,
+        'P' => updated_version[2] += 1,
         _ => unreachable!(),
     }
-
     // Convert the updated version to a string
     updated_version
         .iter()

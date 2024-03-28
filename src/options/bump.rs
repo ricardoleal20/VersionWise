@@ -21,8 +21,8 @@ pub fn bump_version() {
         .iter()
         .position(|line| line.starts_with("## ["))
         .unwrap_or(content.len());
-    // Append the new entry and the content
-    content.insert(start_of_versions_index, format!("\n{}", new_entry.join("")));
+    //content_to_write.truncate(content_to_write.len() - 2);
+    content.insert(start_of_versions_index, format!("{}", new_entry.join("")));
     // Then, by last, write the content
     create_changelog(content, &new_version)
 }

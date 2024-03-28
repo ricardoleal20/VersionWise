@@ -4,11 +4,15 @@
 use colored::*;
 use std::collections::HashSet;
 // Local imports
-use crate::utilities::get_current_changesets;
+use crate::utilities::{find_version, get_current_changesets, update_version};
 
 pub fn list_changesets() {
     // Get the changesets and list them
     let changesets = get_current_changesets();
+    // Find the current project version
+    let new_version = update_version(&changesets, find_version());
+    // Print the new version to set with these changesets
+    println!("# New version to be bumped: v{}.\n", new_version.blue());
     // Add a vec of tags that were visited
     let mut printed_tags: HashSet<&String> = HashSet::new();
     // Process them
