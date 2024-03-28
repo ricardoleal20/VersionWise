@@ -31,6 +31,8 @@ pub fn create_changelog(content: Vec<String>, version: &String) {
     writeln!(file, "{}", content.join("\n")).expect("Error when writing the CHANGELOG.md");
     // Write the new version file too
     update_version_path(version.as_str());
+    // Delete all the current changesets
+    delete_changesets();
     // If everything's cool, then write the successful message
     println!("The `CHANGELOG.md` and version has been updated!");
 }
@@ -66,4 +68,29 @@ pub fn new_changelog_entry(changesets: &Vec<Changeset>, version: &String) -> Vec
     }
     // And at the end, return the content list
     content
+}
+
+fn delete_changesets() {
+    let folder_path = ".changesets";
+    // Verify if the folder exist
+    if let Ok(entries) = fs::read_dir(folder_path) {
+        // Iterate over all the changesets in that folder
+        for entry in entries {
+            if let Ok(entry) = entry {
+                let path = entry.path();
+                // For security, verify if the entry is a file
+                if path.is_file() {
+                    // Try to remove the file
+                    if let Err(e) = fs::remove_file(&path) {
+                        // If you could not delete a file, then panic
+                        panic!("Error deleting file {}: {}", path.display(), e);
+                    }
+                }
+            }
+        }
+    } else {
+        // In this case, panic. It should only reach to this function in case that
+        // the folder `.changeset` exists
+        panic!("The folder {} does not exist.", folder_path);
+    }
 }
