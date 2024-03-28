@@ -18,10 +18,10 @@ version_path = ["pyproject.toml", "Cargo.toml"]
 requires = [
     "setuptools",
     "wheel>=0.36.2",
-    "tomli>=1.1.0 ; python_version<'3.11'",
+    "maturin>=1.5.1; python_version<'3.11'",
     "setuptools-rust>=1.4.0",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "maturin"
 
 [project]
 name = "sempyver"
@@ -32,5 +32,5 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = ["tomli>=1.1.0 ; python_version>'3.7'"]
+dependencies = ["maturin>=1.5.1 ; python_version>'3.7'"]
 dynamic = ["authors", "description", "license", "readme", "version"]
