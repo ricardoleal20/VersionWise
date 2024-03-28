@@ -152,7 +152,6 @@ pub fn update_version(changes: &Vec<Changeset>, version: String) -> String {
 fn update_version_path(new_version: &str) {
     // Find the current version path
     let version_path = find_version_in_file();
-
     // Open the file
     let mut file = match fs::File::open(&version_path) {
         Ok(file) => file,
@@ -160,16 +159,13 @@ fn update_version_path(new_version: &str) {
             panic!("Error opening file {}: {}.", version_path, e);
         }
     };
-
     // Read the content as a String
     let mut content = String::new();
     if let Err(e) = file.read_to_string(&mut content) {
         panic!("Error reading file {}: {}.", version_path, e);
     }
-
     // Substitute the old version for the new version
-    let updated_content = content.replace(find_version_in_file().as_str(), new_version);
-
+    let updated_content = content.replace(find_version().as_str(), new_version);
     // Reopen the file but this time as writing mode
     file = match fs::File::create(&version_path) {
         Ok(file) => file,
@@ -177,7 +173,6 @@ fn update_version_path(new_version: &str) {
             panic!("Error creating file {}: {}.", version_path, e);
         }
     };
-
     // Write the new file
     if let Err(e) = file.write_all(updated_content.as_bytes()) {
         panic!("Error writing to file {}: {}.", version_path, e);
