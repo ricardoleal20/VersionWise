@@ -3,6 +3,7 @@ use std::fs;
 use std::io::{BufRead, BufReader, Write};
 // Local imports
 use crate::options::Changeset;
+use crate::utilities::update_version_path;
 
 /// Function to open the Changeset in case that exists
 pub fn open_changelog() -> Vec<String> {
@@ -22,22 +23,25 @@ pub fn open_changelog() -> Vec<String> {
     content
 }
 
-pub fn create_changelog(content: Vec<String>) {
+pub fn create_changelog(content: Vec<String>, version: &String) {
     // Crea un nuevo archivo CHANGELOG.md
     let mut file = fs::File::create("CHANGELOG.md").expect("Error creating the CHANGELOG.md");
 
     // Write the entire CHANGELOG content
     writeln!(file, "{}", content.join("\n")).expect("Error when writing the CHANGELOG.md");
-
+    // Write the new version file too
+    update_version_path(version.as_str());
     // If everything's cool, then write the successful message
-    println!("The CHANGELOG.md has been updated!");
+    println!("The `CHANGELOG.md` and version has been updated!");
 }
 
-pub fn new_changelog_entry(changesets: Vec<Changeset>) -> Vec<String> {
+pub fn new_changelog_entry(changesets: &Vec<Changeset>, version: &String) -> Vec<String> {
+    // Update the version based on the latest
     // First, get a list of printed tags to avoid read the same tag twice
     let mut printed_tags: HashSet<&String> = HashSet::new();
     // Create a mutable for the content written
     let mut content: Vec<String> = Vec::new();
+    content.push(format!("## [{}]\n", version));
     for changeset in changesets.iter() {
         // Evaluate if this tag has been written
         if printed_tags.contains(&changeset.tag) {
