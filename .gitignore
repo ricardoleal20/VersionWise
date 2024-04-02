@@ -18,3 +18,10 @@ poetry.lock
 
 # Ignore the .env
 .env
+
+# Ignore the .DS_STORE
+.DS_STORE
+
+# Ignore the png
+.png
+.jpeg
