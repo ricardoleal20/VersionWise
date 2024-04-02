@@ -16,3 +16,5 @@ Cargo.lock
 # Ignore the poetry.lock
 poetry.lock
 
+# Ignore the .env
+.env
