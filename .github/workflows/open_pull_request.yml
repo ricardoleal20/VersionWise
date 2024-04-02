@@ -10,7 +10,7 @@ on:
   # -------------------------------------------------------------------------- #
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
+      CUSTOM_GITHUB_TOKEN:
         description: "Token for be able to open Pull Requests and perform commits"
         required: true
 
@@ -44,7 +44,7 @@ jobs:
     - name: Run Python script 🖥️
       run: python .github/utilities/open_pr.py 
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
         BRANCH_NAME: ${{ github.ref }}
         REPO_NAME: ${{ github.repository }}
 
