@@ -1,0 +1,52 @@
+name: 🤖 Automated Bump PR 🔖
+
+on:
+  push:
+    branches:
+      - main
+  # -------------------------------------------------------------------------- #
+  # To use this Workflow, you need to specify this line on your job:           #
+  # uses: ricardoleal20/sempyver/.github/workflows/open_pull_request.yml@main  #
+  # -------------------------------------------------------------------------- #
+  workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+        description: "Token for be able to open Pull Requests and perform commits"
+        required: true
+
+# Generate the jobs for this
+jobs:
+  # Name of the main job for this
+  bump_and_open_pr:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Check the code to see the differences
+    - name: Checkout code 🧑‍💻
+      uses: actions/checkout@v3
+
+    - name: Set up Python 🐍
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies 🏗️
+      run: |
+        pip install PyGithub
+        pip install maturin
+
+    - name: Perform changeset changes
+      run: |
+        maturin develop
+        sempyver build
+        git add --all
+
+    - name: Run Python script 🖥️
+      run: python .github/utilities/open_pr.py 
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH_NAME: ${{ github.ref }}
+        REPO_NAME: ${{ github.repository }}
+
+    # If the linter pass
+    - run: echo "The PR has been open! ✅"
