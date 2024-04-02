@@ -40,7 +40,7 @@ jobs:
 
     - name: Perform changeset changes
       run: |
-        poetry run sempyver -- build
+        poetry run sempyver bump
         git add --all
 
     - name: Run Python script 🖥️
