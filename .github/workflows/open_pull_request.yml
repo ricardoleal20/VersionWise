@@ -32,13 +32,14 @@ jobs:
 
     - name: Install dependencies 🏗️
       run: |
-        pip install PyGithub
-        pip install maturin
+        pip install poetry
+        poetry run pip install PyGithub
+        poetry run pip install maturin
 
     - name: Perform changeset changes
       run: |
-        maturin develop
-        sempyver build
+        poetry run maturin develop
+        poetry run sempyver build
         git add --all
 
     - name: Run Python script 🖥️
