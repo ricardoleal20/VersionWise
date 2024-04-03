@@ -41,7 +41,6 @@ jobs:
     - name: Perform changeset changes
       run: |
         poetry run sempyver bump
-        git add --all
 
     - name: Run Python script 🖥️
       run: poetry run python .github/utilities/open_pr.py 

@@ -25,12 +25,12 @@ build-backend = "maturin"
 
 [project]
 name = "sempyver"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Topic :: Software Management :: Management Tools",
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = ["maturin>=1.5.1 ; python_version>'3.7'"]
+dependencies = ["maturin>=1.5.1 ; python_version>'3.8'"]
 dynamic = ["authors", "description", "license", "readme", "version"]
