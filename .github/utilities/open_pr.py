@@ -87,21 +87,49 @@ def open_pull_request(token: str, repo: str, branch: str) -> None:
     git_branch = git_repo.get_branch(branch)
     # Set some default values
     branch_pr = "bump-new-version"
-    pr_body = "### 🚀 New Bump\n\nAutomatically bumping based on latest changesets."
+    pr_body = "### 🚀 New Bump\nAutomatically bumping based on latest changesets.\n"
+    pr_title = "Bump new project to version v"
+    # Add the latest CHANGELOG perform
+    useful_changelog_changes = "# Changelog\n"
+    add_content: bool = False
+    with open("CHANGELOG.md", "r", encoding="utf-8") as changelog:
+        for line in changelog.readlines():
+            if line.startswith("## ["):
+                add_content = not add_content
+                # Also, update the PR title adding the new
+                pr_title += line.replace("## [", "").replace("]", "")
+                # If you've add all the content on this new
+                # bumped version, then break everything
+                if add_content is False:
+                    break
+            # Add the content ONLY if the add content is True
+            if add_content is True:
+                useful_changelog_changes += line
+    # Update the PR body using this changelog changes
+    pr_body += useful_changelog_changes
     # Check if the reference exists or not
     try:
         # Select the exiting repo
         git_repo.get_branch(branch_pr)
+        branch_exists: bool = True
     except GithubException:
         # Create the new reference
         git_repo.create_git_ref(
             ref=f"refs/heads/{branch_pr}", sha=git_branch.commit.sha)
+        branch_exists: bool = False
         # Get the branch
     # From the new Branch created, apply the new commit from the changesets
     apply_changesets(token, repo, branch_pr)
-    # Create the Pull Request
-    git_repo.create_pull(title="Bump new project version",
-                         body=pr_body, head=branch_pr, base=branch)
+    if branch_exists:
+        # Get the Pull Request and modify it
+        [pr] = git_repo.get_pulls(state="open", head=branch_pr)
+        pr.edit(title=pr_title, body=pr_body)
+        print("Pull request modified")
+    else:
+        # Create the Pull Request
+        git_repo.create_pull(title=pr_title,
+                             body=pr_body, head=branch_pr, base=branch)
+        print("Pull request created")
 
 
 if __name__ == "__main__":
