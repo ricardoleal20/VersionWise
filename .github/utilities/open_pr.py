@@ -19,7 +19,7 @@ def get_all_file_paths(
     if available_files is None:
         available_files = set()
     # Iterate over all the files in this path
-    for file in os.listdir(path):
+    for _, __, file in os.walk(path):
         # Ignore those that are private or are related to a dump
         if file.startswith(".") or file.endswith(("target", ".png", ".jpeg")):
             # Make sure that the changesets are also reviewed,
@@ -119,7 +119,7 @@ def open_pull_request(token: str, repo: str, branch: str) -> None:
         branch_exists: bool = False
         # Get the branch
     # From the new Branch created, apply the new commit from the changesets
-    apply_changesets(token, repo, branch_pr)
+    # apply_changesets(token, repo, branch_pr)
     if branch_exists:
         # Get the Pull Request and modify it
         [pr] = git_repo.get_pulls(state="open", head=branch_pr)
