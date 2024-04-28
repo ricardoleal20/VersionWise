@@ -15,12 +15,7 @@ maturin = ">=1.5.1"
 version_path = ["pyproject.toml", "Cargo.toml"]
 
 [build-system]
-requires = [
-    "setuptools",
-    "wheel>=0.36.2",
-    "maturin>=1.5.1; python_version<'3.11'",
-    "setuptools-rust>=1.4.0",
-]
+requires = ["maturin>=1.5.1; python_version<'3.11'", "setuptools-rust>=1.4.0"]
 build-backend = "maturin"
 
 [project]
