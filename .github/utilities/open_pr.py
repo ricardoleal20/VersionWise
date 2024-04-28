@@ -3,41 +3,68 @@ Open a Pull Request for the latest versions bumped on the
 main branch.
 """
 import os
+import requests
 from typing import Optional
 # Import the Github token
 from github import Github, InputGitTreeElement
 from github.GithubException import GithubException
 
 
+# def get_all_file_paths(
+#     relative_path: str,
+#     available_files: Optional[set] = None,
+#     path: Optional[str] = None,
+# ) -> set[tuple[str, str]]:
+#     """Get all the file paths available"""
+#     # If there's no available files, then instance one
+#     if available_files is None:
+#         available_files = set()
+#     # Iterate over all the files in this path
+#     for _, __, file in os.walk(path):
+#         # Ignore those that are private or are related to a dump
+#         if file.startswith(".") or file.endswith(("target", ".png", ".jpeg")):
+#             # Make sure that the changesets are also reviewed,
+#             # so this is an exception of the `startswith(.)`
+#             if not file.startswith(".changesets"):
+#                 continue
+#         path_file = os.path.join(path, file)
+#         # If this is a directory, search into it
+#         if os.path.isdir(path_file):
+#             available_files = get_all_file_paths(
+#                 relative_path, available_files, path_file)
+#         else:
+#             # If not, add the current path
+#             with open(path_file, 'r', encoding="utf-8") as f:
+#                 available_files.add(
+#                     (os.path.relpath(path_file, relative_path), f.read())
+#                 )
+#     # At the end, return the set
+#     return available_files
+
 def get_all_file_paths(
-    relative_path: str,
-    available_files: Optional[set] = None,
-    path: Optional[str] = None,
+    github_repo,
+    branch: str = "main"
 ) -> set[tuple[str, str]]:
-    """Get all the file paths available"""
-    # If there's no available files, then instance one
-    if available_files is None:
-        available_files = set()
-    # Iterate over all the files in this path
-    for _, __, file in os.walk(path):
-        # Ignore those that are private or are related to a dump
-        if file.startswith(".") or file.endswith(("target", ".png", ".jpeg")):
-            # Make sure that the changesets are also reviewed,
-            # so this is an exception of the `startswith(.)`
-            if not file.startswith(".changesets"):
-                continue
-        path_file = os.path.join(path, file)
-        # If this is a directory, search into it
-        if os.path.isdir(path_file):
-            available_files = get_all_file_paths(
-                relative_path, available_files, path_file)
-        else:
-            # If not, add the current path
-            with open(path_file, 'r', encoding="utf-8") as f:
-                available_files.add(
-                    (os.path.relpath(path_file, relative_path), f.read())
-                )
-    # At the end, return the set
+    """Get all the file paths available in the main branch of a GitHub repository"""
+    # Initialize an empty set to store file paths and their content
+    available_files = set()
+    # Get the contents of the main branch
+    contents = github_repo.get_contents("", ref=branch)
+
+    # Recursively traverse the repository contents
+    def traverse_contents(contents, path=""):
+        for content in contents:
+            if content.type == "dir":
+                # Recursively traverse directories
+                traverse_contents(github_repo.get_contents(
+                    content.path, ref=branch), path + content.path + "/")
+            else:
+                # Add file path
+                available_files.add(content.path)
+
+    # Start traversing from the root directory
+    traverse_contents(contents)
+
     return available_files
 
 def apply_changesets(token: str, repo: str, branch: str) -> None:
@@ -49,8 +76,7 @@ def apply_changesets(token: str, repo: str, branch: str) -> None:
     git_branch = git_repo.get_branch(branch)
     head_sha = git_branch.commit.sha
     # Get the available files
-    relative_path = os.getcwd()
-    available_files = get_all_file_paths(relative_path, path=relative_path)
+    available_files = get_all_file_paths(git_repo)
     # Create a list for the detected changes
     changed_files = set()
     for file, file_content in available_files:
@@ -119,7 +145,7 @@ def open_pull_request(token: str, repo: str, branch: str) -> None:
         branch_exists: bool = False
         # Get the branch
     # From the new Branch created, apply the new commit from the changesets
-    # apply_changesets(token, repo, branch_pr)
+    apply_changesets(token, repo, branch_pr)
     if branch_exists:
         # Get the Pull Request and modify it
         [pr] = git_repo.get_pulls(state="open", head=branch_pr)
