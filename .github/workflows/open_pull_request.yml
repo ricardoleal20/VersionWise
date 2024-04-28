@@ -9,10 +9,6 @@ on:
   # uses: ricardoleal20/sempyver/.github/workflows/open_pull_request.yml@main  #
   # -------------------------------------------------------------------------- #
   workflow_call:
-    secrets:
-      CUSTOM_GITHUB_TOKEN:
-        description: "Token for be able to open Pull Requests and perform commits"
-        required: true
 
 # Generate the jobs for this
 jobs:
@@ -52,7 +48,7 @@ jobs:
     - name: Run Python script for open the new branch and the PR 🖥️
       run: poetry run python .github/utilities/open_pr.py
       env:
-        GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH_NAME: ${{ github.ref }}
         REPO_NAME: ${{ github.repository }}
 
