@@ -49,5 +49,13 @@ jobs:
         BRANCH_NAME: ${{ github.ref }}
         REPO_NAME: ${{ github.repository }}
 
+    - name: Add changed files with Git 🔍
+      run: |
+        git pull
+        git checkout bump-new-version
+        git add --all
+        git commit -m "🔖 Tag: Bump new project version using Sempyver"
+        git push
+
     # If the linter pass
     - run: echo "The PR has been open! ✅"
