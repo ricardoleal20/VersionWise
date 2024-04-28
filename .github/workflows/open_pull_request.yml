@@ -42,8 +42,8 @@ jobs:
       run: |
         poetry run sempyver bump
 
-    - name: Add changed files with Git 🔍
-      run: git add --all
+    - name: Add deleted files with Git 🔍
+      run: git add --u
 
     - name: Run Python script 🖥️
       run: poetry run python .github/utilities/open_pr.py
