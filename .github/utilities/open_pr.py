@@ -59,8 +59,10 @@ def get_all_file_paths(
                 traverse_contents(github_repo.get_contents(
                     content.path, ref=branch), path + content.path + "/")
             else:
-                # Add file path
-                available_files.add(content.path)
+                # Add file path and content to the set
+                file_content = requests.get(
+                    content.download_url, timeout=60).text
+                available_files.add((content.path, file_content))
 
     # Start traversing from the root directory
     traverse_contents(contents)
