@@ -41,6 +41,10 @@ jobs:
         poetry run pip install maturin
         poetry run maturin develop
 
+    - name: Perform changeset changes
+      run: |
+        poetry run sempyver bump
+
     - name: Run Python script for open the new branch and the PR 🖥️
       run: poetry run python .github/utilities/open_pr.py
       env:
@@ -48,12 +52,13 @@ jobs:
         BRANCH_NAME: ${{ github.ref }}
         REPO_NAME: ${{ github.repository }}
 
-    - name: Perform changeset changes and add them with Git 🔍
+    - name: Add changed files with Git 🔍
       run: |
         git pull
+        git stash
         git checkout bump-new-version
-        poetry run sempyver bump
         git pull origin
+        git stash pop
         git add --all
         git commit -m "🔖 Tag: Bump new project version using Sempyver"
         git push
