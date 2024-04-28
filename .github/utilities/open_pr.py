@@ -116,12 +116,14 @@ def open_pull_request(token: str, repo: str, branch: str) -> None:
         # Get the branch
     # From the new Branch created, apply the new commit from the changesets
     # apply_changesets(token, repo, branch_pr)
-    if branch_exists:
-        # Get the Pull Request and modify it
-        [pr] = git_repo.get_pulls(state="open", head=branch_pr)
-        pr.edit(title=pr_title, body=pr_body)
-        print("Pull request modified")
-    else:
+    # if branch_exists:
+    #     # Get the Pull Request and modify it
+    #     [pr] = git_repo.get_pulls(state="open", head=branch_pr)
+    #     pr.edit(title=pr_title, body=pr_body)
+    #     print("Pull request modified")
+    # else:
+    if branch_exists is False:
+        apply_changesets(token, repo, branch_pr)
         # Create the Pull Request
         git_repo.create_pull(title=pr_title,
                              body=pr_body, head=branch_pr, base=branch)
