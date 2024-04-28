@@ -7,8 +7,8 @@
 
 ![PyPi version](https://img.shields.io/pypi/v/sempyver?label=PyPi%20version&logo=PyPi&style=for-the-badge)
 ![Python versions supported](https://img.shields.io/pypi/pyversions/sempyver?label=Python%20Versions%20Supported&logo=Python&style=for-the-badge)
-![Deployed](https://img.shields.io/github/actions/workflow/status/ricardoleal20/SemPyVer/publish.yml?branch=main&label=LAST%20VERSION%20DEPLOYED%20%F0%9F%9A%80&logo=Github&style=for-the-badge)
-![License](https://img.shields.io/github/license/ricardoleal20/SemPyVer?color=%23808000&label=%F0%9F%93%84%20LICENSE&style=for-the-badge)
+![Deployed](https://img.shields.io/github/actions/workflow/status/ricardoleal20/sempyver/.github/workflows/publish_on_release.yml?branch=main&label=LAST%20VERSION%20DEPLOYED%20%F0%9F%9A%80&logo=Github&style=for-the-badge)
+![License](https://img.shields.io/github/license/ricardoleal20/sempyver?color=%23808000&label=%F0%9F%93%84%20LICENSE&style=for-the-badge)
 
 ## Installation
 
