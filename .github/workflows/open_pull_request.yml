@@ -25,6 +25,13 @@ jobs:
     - name: Checkout code 🧑‍💻
       uses: actions/checkout@v3
 
+    - name: Set Git user globally to github-actions ⑆
+      uses: gotmax23/set-bot-git-user-action@main
+      with:
+        global: true
+        bot: github-actions
+        name: "Github Actions"
+
     - name: Set up Python 🐍
       uses: actions/setup-python@v2
       with:
