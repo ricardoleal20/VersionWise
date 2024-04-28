@@ -42,8 +42,8 @@ jobs:
       run: |
         poetry run sempyver bump
 
-    - name: Run Python script 🖥️
-      run: poetry run python .github/utilities/open_pr.py 
+    - name: Run Python script for open the new branch and the PR 🖥️
+      run: poetry run python .github/utilities/open_pr.py
       env:
         GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
         BRANCH_NAME: ${{ github.ref }}
