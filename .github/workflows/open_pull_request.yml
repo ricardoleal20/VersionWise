@@ -56,6 +56,7 @@ jobs:
       run: |
         git pull
         git checkout bump-new-version
+        git pull origin
         git add --all
         git commit -m "🔖 Tag: Bump new project version using Sempyver"
         git push
