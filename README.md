@@ -22,12 +22,6 @@ Please consider that it requires `Python >=3.8`
 
 ## Usage
 
-Sure! Here's an example of how you can write the usage instructions in English for the `README.md` file:
-
----
-
-## Usage
-
 This Rust package, `sempyver`, provides several command-line tools for managing project versions and changesets. Below are the available commands and their usage examples.
 
 ### Commands

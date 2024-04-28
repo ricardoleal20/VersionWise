@@ -17,10 +17,13 @@ fn main() {
         .subcommand(list)
         .subcommand(bump)
         .long_about("This module allows you to easily create and manage changesets for your project, providing a structured approach to documenting and tracking changes throughout the development process. Changesets help teams maintain better control over project updates, ensuring clear communication and effective collaboration. With this tool, you can streamline the process of recording changes, facilitating smoother project management and development workflows.")
-        .help("[ARGS]
+        .help("Module for creating and using changesets to manage changes in team projects.
+
+[OPTIONS]
 \t- `create`: Create a new changeset
 \t- `list`: List the current changes and how they affect the current version
-\t- `bump`: Release the new version and new changelog. Delete all the current changesets.")
+\t- `bump`: Release the new version and new changelog. Delete all the current changesets."
+)
         ;
     // Add the methods to the app method
     // Search for the matches
