@@ -23,7 +23,7 @@ pub fn find_version() -> String {
     open_path(version_path)
 }
 
-fn find_version_in_file() -> String {
+pub fn find_version_in_file() -> String {
     // Search the `pyproject.toml` in the root folder
     let route = "pyproject.toml";
 
@@ -31,7 +31,7 @@ fn find_version_in_file() -> String {
     let config = match fs::read_to_string(route) {
         Ok(config) => config,
         Err(e) => {
-            panic!("Error reading {}: {}", route, e);
+            panic!("Error reading the `pyproject.toml` file: {}", e);
         }
     };
 
@@ -44,7 +44,7 @@ fn find_version_in_file() -> String {
     };
 
     // Search the [tool.sempyver] version path
-    let mut version_path: String = String::new();
+    let version_path: String;
     if let Some(tool) = toml_config.get("tool") {
         if let Some(sempyver) = tool.get("sempyver") {
             if let Some(possible_path) = sempyver.get("version_path") {
@@ -71,7 +71,7 @@ fn find_version_in_file() -> String {
     version_path
 }
 
-fn open_path(path: String) -> String {
+pub fn open_path(path: String) -> String {
     // Open the file
     let file = match fs::File::open(path.clone()) {
         Ok(file) => file,
