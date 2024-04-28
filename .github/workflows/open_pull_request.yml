@@ -42,8 +42,11 @@ jobs:
       run: |
         poetry run sempyver bump
 
+    - name: Add changed files with Git 🔍
+      run: git add --all
+
     - name: Run Python script 🖥️
-      run: poetry run python .github/utilities/open_pr.py 
+      run: poetry run python .github/utilities/open_pr.py
       env:
         GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
         BRANCH_NAME: ${{ github.ref }}
