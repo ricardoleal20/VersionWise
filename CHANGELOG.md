@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Add
 
-- `Sempyver backend in Rust`: Write the SempyVer BackEnd with Rust, that includes the methods `create` to create changesets, `bump` to use the current changesets to update the version and the changelog and `list` to list the current changes.
 - `Github Workflows`: Add a Github workflow for automatic Pull Requests opening and automatic updates.
+- `Sempyver backend in Rust`: Write the SempyVer BackEnd with Rust, that includes the methods `create` to create changesets, `bump` to use the current changesets to update the version and the changelog and `list` to list the current changes.
 
 ### Patch
 
