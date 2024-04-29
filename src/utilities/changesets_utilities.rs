@@ -94,6 +94,8 @@ pub fn get_current_changesets() -> Vec<Changeset> {
             }
         }
     }
+    // Sort them
+    changesets.sort();
     // At the end, return the changesets
     changesets
 }
