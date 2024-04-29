@@ -58,7 +58,7 @@ jobs:
         git stash
         git checkout bump-new-version
         git pull origin
-        git stash pop
+        git stash apply --index
         git add --all
         git commit -m "🔖 Tag: Bump new project version using Sempyver"
         git push
