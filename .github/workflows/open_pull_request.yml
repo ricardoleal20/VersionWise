@@ -55,13 +55,9 @@ jobs:
     - name: Add changed files with Git 🔍
       run: |
         git pull
-        git stash
-        git checkout bump-new-version
-        git pull origin
-        git stash apply --index
         git add --all
         git commit -m "🔖 Tag: Bump new project version using Sempyver"
-        git push
+        git push origin bump-new-version
 
     # If the linter pass
     - run: echo "The PR has been open! ✅"
