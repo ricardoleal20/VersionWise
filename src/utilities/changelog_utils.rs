@@ -24,7 +24,7 @@ pub fn open_changelog() -> Vec<String> {
 }
 
 pub fn create_changelog(content: Vec<String>, version: &String) {
-    // Crea un nuevo archivo CHANGELOG.md
+    // Create a new CHANGELOG.md file
     let mut file = fs::File::create("CHANGELOG.md").expect("Error creating the CHANGELOG.md");
 
     // Write the entire CHANGELOG content

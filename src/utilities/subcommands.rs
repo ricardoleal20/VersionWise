@@ -44,6 +44,7 @@ pub fn create_subcommands() -> (APP, APP, APP) {
     let list = add_list_subcommand();
     // Create the `bump` subcommand
     let bump = add_bump_subcommand();
+    // Create the extra commands
     // Return the commands
     (create, list, bump)
 }
