@@ -1,0 +1,8 @@
+[changeset]
+change_type = "MINOR"
+tag = "Add"
+version = "0.1.0"
+
+[changes]
+modules = ["Github Workflows"]
+description = "Add a Github workflow for automatic Pull Requests opening and automatic updates"
