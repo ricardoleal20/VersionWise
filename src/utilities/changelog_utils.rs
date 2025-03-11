@@ -54,12 +54,12 @@ pub fn new_changelog_entry(changesets: &Vec<Changeset>, version: &String) -> Vec
         // Filter for all the same tags
         for nested_changeset in changesets.iter().filter(|c| c.tag == changeset.tag) {
             // Then, write all the changes
-            if nested_changeset.module == "" {
+            if nested_changeset.modules == "" {
                 content.push(format!("- {}.\n", nested_changeset.message));
             } else {
                 content.push(format!(
                     "- {}: {}.\n",
-                    nested_changeset.module, nested_changeset.message
+                    nested_changeset.modules, nested_changeset.message
                 ));
             }
         }

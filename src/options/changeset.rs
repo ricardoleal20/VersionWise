@@ -33,7 +33,7 @@ fn update_version(change: &String, version: String) -> String {
 pub struct Changeset {
     pub name: String,
     pub change: String,
-    pub module: String,
+    pub modules: String,
     pub tag: String,
     pub message: String,
     pub version: String,
@@ -43,7 +43,7 @@ impl Changeset {
     pub fn new(
         name: String,
         change: String,
-        module: String,
+        modules: String,
         tag: String,
         message: String,
         version: String,
@@ -55,43 +55,11 @@ impl Changeset {
         Changeset {
             name,
             change,
-            module,
+            modules,
             tag,
             message,
             version: new_version,
         }
-    }
-
-    /// Method to update the version based on the change type
-    pub fn updated_version(&mut self) -> String {
-        // Initialize the version parts to define the newest version!
-        let mut version_parts: Vec<String> =
-            self.version.split('.').map(|s| s.to_string()).collect();
-        // Get the change in string
-        let change: &str = &self.change;
-        match change {
-            "MAJOR" => {
-                // If it is a major change, we need to increment the major version
-                // and reset the minor and patch versions to 0
-                version_parts[0] = (version_parts[0].parse::<u32>().unwrap() + 1).to_string();
-                version_parts[1] = "0".to_string();
-                version_parts[2] = "0".to_string();
-            }
-            "MINOR" => {
-                // If it is a minor change, we need to increment the minor version
-                // and reset the patch version to 0
-                version_parts[1] = (version_parts[1].parse::<u32>().unwrap() + 1).to_string();
-                version_parts[2] = "0".to_string();
-            }
-            "PATCH" => {
-                // If it is a patch change, we need to increment the patch version
-                version_parts[2] = (version_parts[2].parse::<u32>().unwrap() + 1).to_string();
-            }
-            _ => {}
-        }
-        // Return the updated version as response. This would be the parameter used
-        // to update the version in the CHANGELOG.md
-        version_parts.join(".")
     }
 }
 
@@ -100,7 +68,7 @@ impl PartialEq for Changeset {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
             && self.change == other.change
-            && self.module == other.module
+            && self.modules == other.modules
             && self.tag == other.tag
             && self.message == other.message
             && self.version == other.version

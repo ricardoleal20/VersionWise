@@ -3,15 +3,15 @@
 /// ================================ ///
 // Local imports
 use crate::utilities::{
-    create_changelog, find_version, get_current_changesets, new_changelog_entry, open_changelog,
-    update_version,
+    create_changelog, find_largest_version, get_current_changesets, new_changelog_entry,
+    open_changelog,
 };
 
 pub fn bump_version() {
     // First, get the changesets
     let changesets = get_current_changesets();
     // Find the current project version
-    let new_version = update_version(&changesets, find_version());
+    let new_version = find_largest_version(&changesets).unwrap();
     // From here, parse the changesets as the new Changelog entry
     let new_entry = new_changelog_entry(&changesets, &new_version);
     // Now, read the current CHANGESET file

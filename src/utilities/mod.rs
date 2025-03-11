@@ -1,4 +1,5 @@
 mod changelog_utils;
+mod changeset_structures;
 /// Make the modules accessible
 mod changesets_utilities;
 mod sets_utils;
@@ -109,46 +110,6 @@ pub fn open_path(path: String) -> String {
     panic!("Couldn't find the version in the path {}. Try with the following version names: [\"version\", \"__version__\"]", path);
 }
 
-pub fn update_version(changes: &Vec<Changeset>, version: String) -> String {
-    // Parse the current version
-    let current_version: Vec<u32> = version
-        .split('.')
-        .map(|s| {
-            s.parse()
-                .unwrap_or_else(|_| panic!("Invalid version: {}", version))
-        })
-        .collect();
-
-    // Find the maximum change type in the list of changes
-    let mut max_change = 'P'; // Default value representing no changes
-    for changeset in changes {
-        if changeset.change.contains("MAJOR") {
-            max_change = 'M';
-            // Since there's no other higher option, we'll choose
-            // this as the maximum change type and break the iteration here
-            break;
-        } else if changeset.change.contains("MINOR") && max_change != 'M' {
-            max_change = 'N'; // Reset to 'N' if no MAJOR change found
-        } else if changeset.change.contains("PATCH") && max_change != 'N' {
-            max_change = 'P';
-        }
-    }
-    // Update the version based on the maximum change type
-    let mut updated_version = current_version.clone();
-    match max_change {
-        'M' => updated_version[0] += 1,
-        'N' => updated_version[1] += 1,
-        'P' => updated_version[2] += 1,
-        _ => unreachable!(),
-    }
-    // Convert the updated version to a string
-    updated_version
-        .iter()
-        .map(|&v| v.to_string())
-        .collect::<Vec<String>>()
-        .join(".")
-}
-
 fn update_version_path(new_version: &str) {
     // Find the current version path
     let version_path = find_version_in_file();
@@ -176,5 +137,28 @@ fn update_version_path(new_version: &str) {
     // Write the new file
     if let Err(e) = file.write_all(updated_content.as_bytes()) {
         panic!("Error writing to file {}: {}.", version_path, e);
+    }
+}
+
+/// Find the largest version in a list of changesets
+pub fn find_largest_version(changesets: &[Changeset]) -> Option<String> {
+    changesets
+        .iter()
+        .filter_map(|c| parse_version(&c.version)) // Parse the versions
+        .max() // Obtain the largest version
+        .map(|(major, minor, patch)| format!("{}.{}.{}", major, minor, patch)) // Convert it back to String
+}
+
+/// Parse a version "MAJOR.MINOR.PATCH" into a tuple (u32, u32, u32)
+fn parse_version(version: &str) -> Option<(u32, u32, u32)> {
+    let parts: Vec<u32> = version
+        .split('.') // Divide into parts
+        .filter_map(|p| p.parse().ok()) // Convert to u32
+        .collect();
+
+    if parts.len() == 3 {
+        Some((parts[0], parts[1], parts[2]))
+    } else {
+        None
     }
 }

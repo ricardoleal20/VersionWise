@@ -3,60 +3,35 @@
 // ================================ ///
 use std::fs;
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 // Local imports
 use crate::options::Changeset;
+use crate::utilities::changeset_structures::RawChangeset;
 
-/// From a file content, process it and return it to the Changeset structure
-fn parse_changeset(file_name: &str, file_content: &str) -> Option<Changeset> {
-    // Get the lines
-    let lines = file_content.lines();
+/// From a file content, process it and return the Changeset structure
+fn parse_changeset(file_name: &str) -> Option<Changeset> {
+    // We try to read the file
+    let file_content = fs::read_to_string(file_name).ok()?;
+    // We parse the TOML content into a RawChangeset structure
+    let raw_changeset: RawChangeset = toml::from_str(&file_content).ok()?;
+    // Then, we process the modules
+    let modules = raw_changeset.changes.modules.join(", ");
 
-    // Extract the lines
-    let remaining_lines: Vec<&str> = lines.collect();
-
-    // Get the data from the changeset
-    if remaining_lines.len() >= 3 {
-        let mut module_parts = remaining_lines[1].split(":");
-        let change = module_parts.next().unwrap().to_string();
-        let tag = module_parts.next().unwrap().to_string();
-        // And add the module and message
-        let mut module_message = remaining_lines[3].split(":");
-        // Get the strings comming from the module message next element
-        let mut module = match module_message.next() {
-            Some(module_str) => module_str.trim().to_string(),
-            None => String::new(), // Include a new empty string for the next scenario
-        };
-        let message = match module_message.next() {
-            Some(message_str) => message_str.trim().to_string(),
-            None => {
-                // If there's no second element, clone the module one
-                module.clone()
-            }
-        };
-        // If the module and the message are the same, make the module an empty value
-        if module == message {
-            module = "".to_string()
-        }
-        // Create it
-        Some(Changeset::new(
-            file_name.to_string().split(".md").collect(),
-            change,
-            module,
-            tag,
-            message,
-        ))
-    } else {
-        None
-    }
+    // And, at the end, we create the Changeset structure! Easy peasy!
+    Some(Changeset::new(
+        file_name.to_string(),
+        raw_changeset.changeset.change_type,
+        modules,
+        raw_changeset.changeset.module,
+        raw_changeset.changes.description,
+        raw_changeset.changeset.version,
+    ))
 }
 
 /// Process a file from a file path and from there, process and get the changesets
-fn process_file(file_name: &str, file_path: &PathBuf) -> io::Result<Changeset> {
-    // Process the file content
-    let file_content = fs::read_to_string(file_path)?;
+fn process_file(file_name: &str) -> io::Result<Changeset> {
     // Let's see if we can create a changeset from here
-    if let Some(changeset) = parse_changeset(file_name, &file_content) {
+    if let Some(changeset) = parse_changeset(file_name) {
         Ok(changeset)
     } else {
         Err(io::Error::new(
@@ -83,7 +58,7 @@ pub fn get_current_changesets() -> Vec<Changeset> {
             let file_path = &dir_entry.path();
             // Process. if the filepath is a file and it's extension is .md, then process
             if file_path.is_file() && file_path.extension().map_or(false, |ext| ext == "md") {
-                match process_file(file_name.to_str().unwrap(), file_path) {
+                match process_file(file_name.to_str().unwrap()) {
                     Ok(changeset) => {
                         changesets.push(changeset);
                     }

@@ -31,10 +31,11 @@ pub fn write_changeset_file(changeset: &Changeset) {
     // Start adding it a line of 10 `-`
     message.push_str(&separator);
     message.push_str(&format!("\t{}:{}\n", &changeset.change, &changeset.tag));
+    message.push_str(&format!("\tVERSION:{}\n", &changeset.version));
     message.push_str(&separator);
     // Write the message and the module, if it exists
-    if !changeset.module.is_empty() {
-        message.push_str(&format!("`{}`: ", &changeset.module));
+    if !changeset.modules.is_empty() {
+        message.push_str(&format!("`{}`: ", &changeset.modules));
     }
     message.push_str(&changeset.message);
     // Then, create of the file

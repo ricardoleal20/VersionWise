@@ -13,7 +13,7 @@ use regex::Regex;
 use requestty::{prompt, prompt_one, Question};
 // Local imports
 use crate::options::Changeset;
-use crate::utilities::{create_changeset_folder, write_changeset_file};
+use crate::utilities::{create_changeset_folder, find_version, write_changeset_file};
 
 /// Select tags depending on the change type
 fn select_tags(change_type: &str) -> Vec<String> {
@@ -156,9 +156,11 @@ fn process_answers() -> Changeset {
     Changeset {
         name: name.into(),
         change: change.into(),
-        module: module.into(),
+        modules: module.into(),
         tag: set_tag(change),
         message: message.into(),
+        // Set the version. For that, find the latest version in the changelog
+        version: find_version(),
     }
 }
 
