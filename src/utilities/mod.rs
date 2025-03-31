@@ -159,6 +159,6 @@ fn parse_version(version: &str) -> Option<(u32, u32, u32)> {
     if parts.len() == 3 {
         Some((parts[0], parts[1], parts[2]))
     } else {
-        None
+        Some((0, 0, 0))
     }
 }

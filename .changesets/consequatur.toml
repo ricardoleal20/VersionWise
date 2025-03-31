@@ -1,5 +1,5 @@
 [changeset]
-type = "PATCH"
+change_type = "PATCH"
 tag = "PATCH"
 version = "0.0.1"
 

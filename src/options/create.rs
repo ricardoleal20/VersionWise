@@ -174,7 +174,7 @@ pub fn create_changesets() {
     write_changeset_file(&changeset);
     // Once you have created it, print a confirmation message
     println!(
-        "\n Changeset `{}.md` has been created! 🎉",
+        "\n Changeset `{}.toml` has been created! 🎉",
         changeset.name.green()
     );
 }

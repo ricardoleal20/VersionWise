@@ -10,8 +10,25 @@ use crate::utilities::changeset_structures::RawChangeset;
 
 /// From a file content, process it and return the Changeset structure
 fn parse_changeset(file_name: &str) -> Option<Changeset> {
-    // We try to read the file
-    let file_content = fs::read_to_string(file_name).ok()?;
+    // We try to read the file at first
+    let file_path = format!(".changesets/{}", file_name);
+    let file_content = match fs::read_to_string(&file_path) {
+        Ok(content) => content,
+        Err(e) => {
+            println!("Error reading file: {}", e);
+            return None;
+        }
+    };
+    println!("Parsing TOML content...");
+    let toml_structure = match toml::from_str(&file_content) {
+        Ok(content) => content,
+        Err(e) => {
+            println!("Error reading TOML: {}", e);
+            return None;
+        }
+    };
+    println!("{:?}", toml::from_str(&file_content).ok()?);
+
     // We parse the TOML content into a RawChangeset structure
     let raw_changeset: RawChangeset = toml::from_str(&file_content).ok()?;
     // Then, we process the modules
@@ -22,7 +39,7 @@ fn parse_changeset(file_name: &str) -> Option<Changeset> {
         file_name.to_string(),
         raw_changeset.changeset.change_type,
         modules,
-        raw_changeset.changeset.module,
+        raw_changeset.changeset.tag,
         raw_changeset.changes.description,
         raw_changeset.changeset.version,
     ))
@@ -56,8 +73,8 @@ pub fn get_current_changesets() -> Vec<Changeset> {
             // Get the file path and file name
             let file_name = dir_entry.file_name();
             let file_path = &dir_entry.path();
-            // Process. if the filepath is a file and it's extension is .md, then process
-            if file_path.is_file() && file_path.extension().map_or(false, |ext| ext == "md") {
+            // Process. if the filepath is a file and it's extension is .toml, then process
+            if file_path.is_file() && file_path.extension().map_or(false, |ext| ext == "toml") {
                 match process_file(file_name.to_str().unwrap()) {
                     Ok(changeset) => {
                         changesets.push(changeset);

@@ -22,7 +22,7 @@ pub fn create_changeset_folder() {
 pub fn write_changeset_file(changeset: &Changeset) {
     // Write the Changeset file from the object obtained
     // First, obtain the file name
-    let filename = format!(".changesets/{}.md", &changeset.name);
+    let filename = format!(".changesets/{}.toml", &changeset.name);
     // Then, start generating the message
     let mut message = String::new();
 
