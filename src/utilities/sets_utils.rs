@@ -26,29 +26,30 @@ pub fn write_changeset_file(changeset: &Changeset) {
     // Then, start generating the message
     let mut toml_content = String::new();
 
-    // Write [changeset] section
+    // Write [changeset] section - match the RawChangeset structure
     toml_content.push_str("[changeset]\n");
-    toml_content.push_str(&format!("change_type = \"{}\"\n", &changeset.change));
+    // Remove any tab character that might be in the change field
+    let clean_change = changeset.change.trim_start().trim_end();
+    toml_content.push_str(&format!("change_type = \"{}\"\n", clean_change));
     toml_content.push_str(&format!("tag = \"{}\"\n", &changeset.tag));
     toml_content.push_str(&format!("version = \"{}\"\n", &changeset.version));
     toml_content.push_str("\n");
 
-    // Write [changes] section
+    // Write [changes] section - match the RawChangeset structure
     toml_content.push_str("[changes]\n");
 
-    // Check if modules exists
+    // Check if modules exists and format as array
     if !changeset.modules.is_empty() {
-        // Format modules as an array string in TOML format
         toml_content.push_str(&format!(
             "modules = [\"{}\"]",
-            &changeset.modules.replace(",", "\", \"")
+            &changeset.modules.replace(", ", "\", \"")
         ));
     } else {
         toml_content.push_str("modules = []");
     }
     toml_content.push_str("\n");
 
-    // Add description
+    // Add description (matches the RawChangeset structure)
     toml_content.push_str(&format!("description = \"{}\"\n", &changeset.message));
 
     // Then, create the file

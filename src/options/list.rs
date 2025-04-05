@@ -20,10 +20,7 @@ pub fn list_changesets() {
         // Print the first layer
 
         // Filter the changesets for all those that match the change type
-        for changeset in changesets
-            .iter()
-            .filter(|c| c.change == format!("\t{}", change_type))
-        {
+        for changeset in changesets.iter().filter(|c| c.change.trim() == change_type) {
             // If this tag has been printed already, then continue
             if printed_tags.contains(&changeset.tag) {
                 continue;
@@ -33,7 +30,7 @@ pub fn list_changesets() {
             // And now, filter all the changesets for the tag and the change type
             for nested_changeset in changesets
                 .iter()
-                .filter(|c| c.change == format!("\t{}", change_type) && c.tag == changeset.tag)
+                .filter(|c| c.change.trim() == change_type && c.tag == changeset.tag)
             {
                 // If this changeset has a module, include it. If not, then just don't
                 if nested_changeset.modules == "" {

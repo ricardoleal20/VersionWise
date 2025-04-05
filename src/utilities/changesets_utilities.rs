@@ -19,18 +19,18 @@ fn parse_changeset(file_name: &str) -> Option<Changeset> {
             return None;
         }
     };
+
     println!("Parsing TOML content...");
-    let toml_structure = match toml::from_str(&file_content) {
-        Ok(content) => content,
+    // First try to parse as TOML and provide clear error message if it fails
+    let raw_changeset: RawChangeset = match toml::from_str(&file_content) {
+        Ok(changeset) => changeset,
         Err(e) => {
             println!("Error reading TOML: {}", e);
+            // Print the first few lines of the file for debugging
             return None;
         }
     };
-    println!("{:?}", toml::from_str(&file_content).ok()?);
 
-    // We parse the TOML content into a RawChangeset structure
-    let raw_changeset: RawChangeset = toml::from_str(&file_content).ok()?;
     // Then, we process the modules
     let modules = raw_changeset.changes.modules.join(", ");
 
