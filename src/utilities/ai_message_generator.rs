@@ -12,8 +12,6 @@ use crate::utilities::ai_calls::{gemini, openai};
 /// Configuration for the AI message generator
 #[derive(Debug, Clone)]
 pub struct AIConfig {
-    /// Whether AI generation is enabled
-    pub enabled: bool,
     /// The API key for the AI service
     pub api_key: String,
     /// The model to use for generation
@@ -56,7 +54,6 @@ impl AIConfig {
         let model = env::var("MODEL").expect("MODEL must be set in .env file");
 
         Self {
-            enabled: true,
             api_key,
             model,
             provider,
@@ -174,7 +171,7 @@ pub async fn generate_message_with_ai(
     let prompt = format!(
         "Generate a concise changeset message for a {} change with tag '{}' in module '{}'. \
         The changes include: {}. The message should be clear, professional, and follow \
-        conventional commit message format.",
+        conventional commit message format. Should be returned in a single line.",
         change_type, tag, module, diff_summary
     );
 
