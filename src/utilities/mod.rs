@@ -6,6 +6,7 @@ mod changesets_utilities;
 mod sets_utils;
 mod subcommands;
 // Import the needed methods
+pub mod ai_calls;
 pub use ai_message_generator::{generate_ai_message, AIConfig};
 pub use changelog_utils::{create_changelog, new_changelog_entry, open_changelog};
 pub use changesets_utilities::get_current_changesets;

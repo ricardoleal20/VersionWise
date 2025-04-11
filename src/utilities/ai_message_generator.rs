@@ -4,6 +4,9 @@
 use std::process::Command;
 use std::str;
 
+// Import the AI modules
+use crate::utilities::ai_calls::{gemini, openai};
+
 /// Configuration for the AI message generator
 #[derive(Debug, Clone)]
 pub struct AIConfig {
@@ -13,6 +16,8 @@ pub struct AIConfig {
     pub api_key: Option<String>,
     /// The model to use for generation
     pub model: String,
+    /// The AI provider to use (openai or gemini)
+    pub provider: String,
 }
 
 impl Default for AIConfig {
@@ -20,7 +25,8 @@ impl Default for AIConfig {
         Self {
             enabled: true,
             api_key: None,
-            model: "default".to_string(),
+            model: "gpt-3.5-turbo".to_string(),
+            provider: "openai".to_string(),
         }
     }
 }
@@ -109,65 +115,72 @@ pub fn extract_diff_summary(diff: &str) -> (u32, u32, u32, String) {
     (files_changed / 2, lines_added, lines_removed, summary)
 }
 
-/// Mock function for generating messages with AI
+/// Generate a message using the configured AI provider
 ///
-/// In a real implementation, this would call an AI API with the diff information
-/// to generate an appropriate changeset message.
-pub fn generate_message_with_ai(
+/// # Arguments
+///
+/// * `change_type` - The type of change (MAJOR, MINOR, PATCH)
+/// * `tag` - The tag describing the change
+/// * `module` - The module being changed
+/// * `diff_summary` - A summary of the changes
+/// * `config` - The AI configuration to use
+///
+/// # Returns
+///
+/// A `Result` containing either:
+/// * `Ok(String)` - The generated message
+/// * `Err(String)` - An error message if generation fails
+pub async fn generate_message_with_ai(
     change_type: &str,
     tag: &str,
     module: &str,
     diff_summary: &str,
-) -> String {
-    // This is a mock implementation for now
-    // In a real version, this would call an external AI API
+    config: &AIConfig,
+) -> Result<String, String> {
+    // Construct the prompt for the AI
+    let prompt = format!(
+        "Generate a concise changeset message for a {} change with tag '{}' in module '{}'. \
+        The changes include: {}. The message should be clear, professional, and follow \
+        conventional commit message format.",
+        change_type, tag, module, diff_summary
+    );
 
-    match (change_type, tag) {
-        ("MAJOR", "Remove") => format!(
-            "Remove functionality in {} based on changes: {}",
-            module, diff_summary
-        ),
-        ("MAJOR", "Rename") => format!(
-            "Rename components in {} according to new convention",
-            module
-        ),
-        ("MAJOR", "I/O") => format!(
-            "Change input/output interface in {} to improve usability",
-            module
-        ),
-        ("MAJOR", "Behavior") => format!("Change behavior of {} to fix critical issues", module),
+    // Get the API key, returning an error if not configured
+    let api_key = config
+        .api_key
+        .as_ref()
+        .ok_or_else(|| "API key not configured".to_string())?;
 
-        ("MINOR", "Feature") => format!(
-            "Add new feature to {} that implements {}",
-            module, diff_summary
-        ),
-        ("MINOR", "Add") => format!(
-            "Add functionality to {} to support {}",
-            module, diff_summary
-        ),
-        ("MINOR", "I/O") => format!(
-            "Add optional parameters to {} for extended functionality",
-            module
-        ),
-        ("MINOR", "Deprecated") => format!(
-            "Mark {} as deprecated, to be removed in future version",
-            module
-        ),
-
-        ("PATCH", "Refactor") => format!("Refactor {} to improve code quality", module),
-        ("PATCH", "Bug") => format!("Fix bug in {} where {}", module, diff_summary),
-        ("PATCH", "Optimization") => format!("Optimize {} to improve performance", module),
-        ("PATCH", "Tests") => format!("Add tests for {} to ensure reliability", module),
-        ("PATCH", "Patch") => format!("Update {} to handle edge cases", module),
-
-        _ => format!("Update {} with various improvements", module),
+    // Call the appropriate AI provider
+    match config.provider.to_lowercase().as_str() {
+        "openai" => openai::get_response(&prompt, &config.model, api_key).await,
+        "gemini" => gemini::get_response(&prompt, &config.model, api_key).await,
+        _ => Err(format!("Unsupported AI provider: {}", config.provider)),
     }
 }
 
 /// Main function to generate a message based on changes in a module
 ///
 /// This is the function that should be called from the changeset creation process.
-pub fn generate_ai_message(change_type: &str, tag: &str, module: &str) -> String {
+///
+/// # Arguments
+///
+/// * `change_type` - The type of change (MAJOR, MINOR, PATCH)
+/// * `tag` - The tag describing the change
+/// * `module` - The module being changed
+/// * `config` - The AI configuration to use
+///
+/// # Returns
+///
+/// A `Result` containing either:
+/// * `Ok(String)` - The generated message
+/// * `Err(String)` - An error message if generation fails
+pub async fn generate_ai_message(
+    change_type: &str,
+    tag: &str,
+    module: &str,
+    config: &AIConfig,
+) -> Result<String, String> {
     // Check if module is a file path that can be analyzed
     let diff = if !module.is_empty() {
         get_git_diff(module)
@@ -178,9 +191,9 @@ pub fn generate_ai_message(change_type: &str, tag: &str, module: &str) -> String
     // If we have a diff, analyze it and generate a message
     if let Some(diff_content) = diff {
         let (_files, _added, _removed, summary) = extract_diff_summary(&diff_content);
-        generate_message_with_ai(change_type, tag, module, &summary)
+        generate_message_with_ai(change_type, tag, module, &summary, config).await
     } else {
         // Fallback if no diff is available
-        generate_message_with_ai(change_type, tag, module, "recent changes")
+        generate_message_with_ai(change_type, tag, module, "recent changes", config).await
     }
 }
