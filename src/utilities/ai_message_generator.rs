@@ -1,3 +1,5 @@
+use dotenv::dotenv;
+use std::env;
 /// AI-based message generator for changesets
 /// This module provides functionality to generate changeset messages
 /// based on git changes using AI assistance.
@@ -12,21 +14,52 @@ use crate::utilities::ai_calls::{gemini, openai};
 pub struct AIConfig {
     /// Whether AI generation is enabled
     pub enabled: bool,
-    /// The API key for the AI service (if needed)
-    pub api_key: Option<String>,
+    /// The API key for the AI service
+    pub api_key: String,
     /// The model to use for generation
     pub model: String,
     /// The AI provider to use (openai or gemini)
     pub provider: String,
 }
 
-impl Default for AIConfig {
-    fn default() -> Self {
+impl AIConfig {
+    /// Builds a new AIConfig from environment variables
+    ///
+    /// # Returns
+    ///
+    /// A new AIConfig instance
+    ///
+    /// # Panics
+    ///
+    /// Panics if any of the required environment variables are not set:
+    /// - AI_PROVIDER
+    /// - API_KEY
+    /// - MODEL
+    pub fn build() -> Self {
+        // Load environment variables from .env file
+        dotenv().ok();
+
+        // Get provider from env
+        let provider = env::var("AI_PROVIDER")
+            .expect("AI_PROVIDER must be set in .env file")
+            .to_lowercase();
+
+        // Validate provider
+        if provider != "openai" && provider != "gemini" {
+            panic!("AI_PROVIDER must be either 'openai' or 'gemini'");
+        }
+
+        // Get API key from env
+        let api_key = env::var("API_KEY").expect("API_KEY must be set in .env file");
+
+        // Get model from env
+        let model = env::var("MODEL").expect("MODEL must be set in .env file");
+
         Self {
             enabled: true,
-            api_key: None,
-            model: "gpt-3.5-turbo".to_string(),
-            provider: "openai".to_string(),
+            api_key,
+            model,
+            provider,
         }
     }
 }
@@ -145,16 +178,10 @@ pub async fn generate_message_with_ai(
         change_type, tag, module, diff_summary
     );
 
-    // Get the API key, returning an error if not configured
-    let api_key = config
-        .api_key
-        .as_ref()
-        .ok_or_else(|| "API key not configured".to_string())?;
-
     // Call the appropriate AI provider
     match config.provider.to_lowercase().as_str() {
-        "openai" => openai::get_response(&prompt, &config.model, api_key).await,
-        "gemini" => gemini::get_response(&prompt, &config.model, api_key).await,
+        "openai" => openai::get_response(&prompt, &config.model, &config.api_key).await,
+        "gemini" => gemini::get_response(&prompt, &config.model, &config.api_key).await,
         _ => Err(format!("Unsupported AI provider: {}", config.provider)),
     }
 }

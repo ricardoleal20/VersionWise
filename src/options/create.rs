@@ -14,10 +14,11 @@ use requestty::{prompt, prompt_one, Answer, Question};
 use std::fs;
 use std::path::Path;
 use std::process::Command;
+use tokio;
 // Local imports
 use crate::options::Changeset;
 use crate::utilities::{
-    create_changeset_folder, find_version, generate_ai_message, write_changeset_file,
+    create_changeset_folder, find_version, generate_ai_message, write_changeset_file, AIConfig,
 };
 
 /// Detect modules in the project by scanning files
@@ -267,9 +268,20 @@ fn ask_for_message(change_type: &str, tag: &str, module: &str) -> String {
     let method = ask_for_message_method();
 
     if method.contains("Generate with AI") {
+        // Create AI configuration using build method
+        let config = AIConfig::build();
+
         // Generate a message with AI
         println!("Analyzing changes and generating message...");
-        let ai_message = generate_ai_message(change_type, tag, module);
+
+        // We need to block on the async call since we're in a sync context
+        let ai_message = tokio::runtime::Runtime::new()
+            .unwrap()
+            .block_on(generate_ai_message(change_type, tag, module, &config))
+            .unwrap_or_else(|e| {
+                println!("Error generating AI message: {}", e);
+                "Error generating message".to_string()
+            });
 
         // Ask if user wants to edit the generated message
         let edit_question = Question::confirm("edit_message")
