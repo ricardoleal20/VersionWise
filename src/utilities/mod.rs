@@ -1,19 +1,21 @@
-mod ai_message_generator;
-mod changelog_utils;
-mod changeset_structures;
+// Module declarations
+pub mod ai_calls;
+pub mod ai_message_generator;
+pub mod changelog_utils;
+pub mod changeset_structures;
+pub mod version_operations;
+
+// Re-exports
+pub use ai_message_generator::{generate_ai_message, AIConfig};
+pub use changelog_utils::{create_changelog, new_changelog_entry, open_changelog};
+
 /// Make the modules accessible
 mod changesets_utilities;
 mod sets_utils;
 mod subcommands;
-// Import the needed methods
-pub mod ai_calls;
-pub use ai_message_generator::{generate_ai_message, AIConfig};
-pub use changelog_utils::{create_changelog, new_changelog_entry, open_changelog};
-pub use changesets_utilities::get_current_changesets;
-pub use sets_utils::{create_changeset_folder, write_changeset_file};
-pub use subcommands::create_subcommands;
 // Local imports
 use crate::options::Changeset;
+pub use sets_utils::{create_changeset_folder, write_changeset_file};
 // Libraries to use
 use regex::Regex;
 use std::fs;

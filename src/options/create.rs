@@ -18,7 +18,8 @@ use tokio;
 // Local imports
 use crate::options::Changeset;
 use crate::utilities::{
-    create_changeset_folder, find_version, generate_ai_message, write_changeset_file, AIConfig,
+    create_changeset_folder, find_version, generate_ai_message,
+    version_operations::calculate_next_version, write_changeset_file, AIConfig,
 };
 
 /// Detect modules in the project by scanning files
@@ -409,6 +410,12 @@ fn process_answers() -> Changeset {
     // Get the message (with AI, templates, or manual input)
     let message = ask_for_message(change, &tag, &module);
 
+    // Get the current version
+    let current_version = find_version();
+
+    // Calculate the next version based on the change type
+    let next_version = calculate_next_version(&current_version, change);
+
     // Create the changeset
     let changeset = Changeset {
         name: name.into(),
@@ -416,8 +423,7 @@ fn process_answers() -> Changeset {
         modules: module,
         tag,
         message,
-        // Set the version. For that, find the latest version in the changelog
-        version: find_version(),
+        version: next_version,
     };
 
     // Return the changeset only if confirmed
