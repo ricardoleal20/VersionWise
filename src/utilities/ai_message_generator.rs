@@ -169,18 +169,38 @@ pub async fn generate_message_with_ai(
 ) -> Result<String, String> {
     // Construct the prompt for the AI
     let prompt = format!(
-        "Generate a concise changeset message for a {} change with tag '{}' in module '{}'. \
-        The changes include: {}. The message should be clear, professional, and follow \
-        conventional commit message format. Should be returned in a single line.",
+        "Generate a changeset message that follows the conventional commit format for a semantic version change. \
+        Details:\n\
+        - Change Type: {}\n\
+        - Tag: {}\n\
+        - Module: {}\n\
+        - Changes: {}\n\n\
+        The message should:\n\
+        1. Start with the tag name followed by a colon and space\n\
+        2. Use present tense\n\
+        3. Be specific about what changed\n\
+        4. Not exceed one line\n\
+        5. Not include the module name if it's already implied\n\
+        Example format: 'Feature: add user authentication system based on Format'\n\
+        Return ONLY the message, no additional text.",
         change_type, tag, module, diff_summary
     );
 
-    // Call the appropriate AI provider
-    match config.provider.to_lowercase().as_str() {
+    // Call the appropriate AI provider and clean the response
+    let response = match config.provider.to_lowercase().as_str() {
         "openai" => openai::get_response(&prompt, &config.model, &config.api_key).await,
         "gemini" => gemini::get_response(&prompt, &config.model, &config.api_key).await,
         _ => Err(format!("Unsupported AI provider: {}", config.provider)),
-    }
+    }?;
+
+    // Clean the response: trim whitespace and ensure single line
+    Ok(response
+        .trim() // Remove leading/trailing whitespace and newlines
+        .lines() // Split into lines
+        .next() // Take first line only
+        .unwrap_or("") // Default to empty string if no lines
+        .trim() // Final trim to ensure no whitespace
+        .to_string())
 }
 
 /// Main function to generate a message based on changes in a module
