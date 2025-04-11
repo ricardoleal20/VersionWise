@@ -16,7 +16,9 @@ use std::path::Path;
 use std::process::Command;
 // Local imports
 use crate::options::Changeset;
-use crate::utilities::{create_changeset_folder, find_version, write_changeset_file};
+use crate::utilities::{
+    create_changeset_folder, find_version, generate_ai_message, write_changeset_file,
+};
 
 /// Detect modules in the project by scanning files
 fn detect_modules() -> Vec<String> {
@@ -244,23 +246,88 @@ fn ask_for_module() -> String {
     module
 }
 
-/// Ask for the message with template suggestions
-fn ask_for_message(change_type: &str, tag: &str) -> String {
-    let template = get_message_template(change_type, tag);
-
-    let message_question = Question::input("message")
-        .message("Write the message for the change")
-        .default(&template)
+/// Ask for message generation method (AI, template, manual)
+fn ask_for_message_method() -> String {
+    let method_question = Question::select("message_method")
+        .message("How would you like to create your changeset message?")
+        .choices(vec![
+            "Generate with AI based on detected changes",
+            "Use message template",
+            "Write message from scratch",
+        ])
         .build();
 
-    let result = prompt_one(message_question).expect("Error getting message input");
-    let message = result.as_string().unwrap();
+    let result = prompt_one(method_question).expect("Error selecting message method");
+    result.as_list_item().unwrap().text.to_string()
+}
 
-    if message.is_empty() || message == template {
-        panic!("There was no message for the changeset or template was not modified. You need to add a personalized message.");
+/// Ask for the message with template suggestions
+fn ask_for_message(change_type: &str, tag: &str, module: &str) -> String {
+    // First, ask which method to use
+    let method = ask_for_message_method();
+
+    if method.contains("Generate with AI") {
+        // Generate a message with AI
+        println!("Analyzing changes and generating message...");
+        let ai_message = generate_ai_message(change_type, tag, module);
+
+        // Ask if user wants to edit the generated message
+        let edit_question = Question::confirm("edit_message")
+            .message(format!(
+                "AI generated message: \n\"{}\"\n\nWould you like to edit this message?",
+                ai_message
+            ))
+            .default(false)
+            .build();
+
+        let edit_result = prompt_one(edit_question).expect("Error asking to edit message");
+
+        if edit_result.as_bool().unwrap() {
+            // User wants to edit the message
+            let edit_message_question = Question::input("edited_message")
+                .message("Edit the message:")
+                .default(&ai_message)
+                .build();
+
+            let edited_result = prompt_one(edit_message_question).expect("Error editing message");
+            edited_result.as_string().unwrap().to_string()
+        } else {
+            // Use the AI message as is
+            ai_message
+        }
+    } else if method.contains("Use message template") {
+        // Use template approach
+        let template = get_message_template(change_type, tag);
+
+        let message_question = Question::input("message")
+            .message("Write the message for the change")
+            .default(&template)
+            .build();
+
+        let result = prompt_one(message_question).expect("Error getting message input");
+        let message = result.as_string().unwrap();
+
+        if message.is_empty() || message == template {
+            panic!("There was no message for the changeset or template was not modified. You need to add a personalized message.");
+        }
+
+        message.to_string()
+    } else {
+        // Write from scratch
+        let message_question = Question::input("message")
+            .message("Write the message for the change")
+            .default("")
+            .build();
+
+        let result = prompt_one(message_question).expect("Error getting message input");
+        let message = result.as_string().unwrap();
+
+        if message.is_empty() {
+            panic!("There was no message for the changeset. You need to add a message.");
+        }
+
+        message.to_string()
     }
-
-    message.to_string()
 }
 
 /// Display a summary and confirm before saving
@@ -327,8 +394,8 @@ fn process_answers() -> Changeset {
     // Get the module (with git and auto-detection)
     let module = ask_for_module();
 
-    // Get the message (with templates)
-    let message = ask_for_message(change, &tag);
+    // Get the message (with AI, templates, or manual input)
+    let message = ask_for_message(change, &tag, &module);
 
     // Create the changeset
     let changeset = Changeset {
