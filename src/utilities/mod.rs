@@ -15,7 +15,9 @@ mod sets_utils;
 mod subcommands;
 // Local imports
 use crate::options::Changeset;
+pub use changesets_utilities::get_current_changesets;
 pub use sets_utils::{create_changeset_folder, write_changeset_file};
+pub use subcommands::create_subcommands;
 // Libraries to use
 use regex::Regex;
 use std::fs;
