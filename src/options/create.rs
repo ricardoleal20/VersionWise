@@ -318,10 +318,18 @@ fn ask_for_message(change_type: &str, tag: &str, module: &str) -> String {
             .build();
 
         let result = prompt_one(message_question).expect("Error getting message input");
-        let message = result.as_string().unwrap();
+        let mut message: String = result.as_string().unwrap().to_string();
 
-        if message.is_empty() || message == template {
-            panic!("There was no message for the changeset or template was not modified. You need to add a personalized message.");
+        while message.is_empty() || message == template {
+            println!(
+                "Error: You need to add a personalized message. The template cannot be used as is."
+            );
+            let retry_question = Question::input("message")
+                .message("Write the message for the change")
+                .default(&template)
+                .build();
+            let retry_result = prompt_one(retry_question).expect("Error getting message input");
+            message = retry_result.as_string().unwrap().to_string();
         }
 
         message.to_string()
