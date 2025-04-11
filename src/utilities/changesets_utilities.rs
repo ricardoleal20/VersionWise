@@ -19,8 +19,6 @@ fn parse_changeset(file_name: &str) -> Option<Changeset> {
             return None;
         }
     };
-
-    println!("Parsing TOML content...");
     // First try to parse as TOML and provide clear error message if it fails
     let raw_changeset: RawChangeset = match toml::from_str(&file_content) {
         Ok(changeset) => changeset,
@@ -30,7 +28,6 @@ fn parse_changeset(file_name: &str) -> Option<Changeset> {
             return None;
         }
     };
-
     // Then, we process the modules
     let modules = raw_changeset.changes.modules.join(", ");
 
