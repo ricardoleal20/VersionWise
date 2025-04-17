@@ -68,21 +68,30 @@ jobs:
         git config --global user.email "github-actions@github.com"
         git config --global user.name "GitHub Actions"
         
-        # Make changes and commit them in the current branch first
+        # Store current changes
+        TEMP_CHANGELOG=$(cat CHANGELOG.md)
+        TEMP_PYPROJECT=$(cat pyproject.toml)
+        TEMP_CARGO=$(cat Cargo.toml)
+        
+        if git show-ref --verify --quiet refs/remotes/origin/bump-new-version; then
+          # If branch exists, checkout and reset
+          git checkout bump-new-version
+          git reset --hard origin/bump-new-version
+          
+          # Apply stored changes
+          echo "$TEMP_CHANGELOG" > CHANGELOG.md
+          echo "$TEMP_PYPROJECT" > pyproject.toml
+          echo "$TEMP_CARGO" > Cargo.toml
+        else
+          # If branch doesn't exist, create it from current state
+          git checkout -b bump-new-version
+        fi
+        
+        # Stage and commit changes
         git add CHANGELOG.md
         git add pyproject.toml
         git add Cargo.toml
         git commit -m "🔖 Bump: Update version and CHANGELOG"
-        
-        if git show-ref --verify --quiet refs/remotes/origin/bump-new-version; then
-          # If branch exists, checkout and rebase
-          git checkout bump-new-version
-          git reset --hard origin/bump-new-version
-          git cherry-pick main
-        else
-          # If branch doesn't exist, create it from current commit
-          git checkout -b bump-new-version
-        fi
         
         # Try push with --force-with-lease for safety
         git push --force-with-lease origin bump-new-version
