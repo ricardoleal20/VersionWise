@@ -51,11 +51,11 @@ pub fn find_version_in_file() -> Vec<String> {
         }
     };
 
-    // Search the [tool.semverai] version path
+    // Search the [tool.versionwise] version path
     let mut version_paths: Vec<String> = Vec::new();
     if let Some(tool) = toml_config.get("tool") {
-        if let Some(semverai) = tool.get("semverai") {
-            if let Some(possible_paths) = semverai.get("version_path") {
+        if let Some(versionwise) = tool.get("versionwise") {
+            if let Some(possible_paths) = versionwise.get("version_path") {
                 if let Some(paths) = possible_paths.as_array() {
                     for path in paths {
                         version_paths.push(path.to_string().replace("\"", ""));
@@ -64,15 +64,15 @@ pub fn find_version_in_file() -> Vec<String> {
                     panic!("The version path doesn't include a path");
                 }
             } else {
-                panic!("The semverai utility doesn't include a `version_path` field")
+                panic!("The versionwise utility doesn't include a `version_path` field")
             }
         } else {
             panic!(
-                "The pyproject doesn't have a semverai as tool. You should have [tool.semverai]."
+                "The pyproject doesn't have a versionwise as tool. You should have [tool.versionwise]."
             )
         }
     } else {
-        panic!("The pyproject doesn't have tools associated. Please add the `semverai` tool as [tool.semverai].")
+        panic!("The pyproject doesn't have tools associated. Please add the `versionwise` tool as [tool.versionwise].")
     }
     if version_paths.is_empty() {
         panic!("Couldn't find any version paths in the configuration.")
