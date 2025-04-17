@@ -41,26 +41,33 @@ jobs:
         poetry run pip install maturin
         poetry run maturin develop
 
-    - name: Perform changeset changes
+    - name: Perform version bump
       run: |
         poetry run versionwise bump
 
-    - name: Run Python script for open the new branch and the PR 🖥️
+    - name: Create and switch to bump branch 🔍
+      run: |
+        if git show-ref --verify --quiet refs/remotes/origin/bump-new-version; then
+          git checkout bump-new-version
+          git pull origin bump-new-version
+        else
+          git checkout -b bump-new-version
+        fi
+        
+        git config --global user.email "github-actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add CHANGELOG.md
+        git add pyproject.toml
+        git add Cargo.toml
+        git commit -m "🔖 Bump: Update version and CHANGELOG"
+        git push origin bump-new-version
+
+    - name: Run Python script for open the PR 🖥️
       run: poetry run python .github/utilities/open_pr.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH_NAME: ${{ github.ref }}
         REPO_NAME: ${{ github.repository }}
 
-    - name: Add changed files with Git 🔍
-      run: |
-        git pull
-        git stash
-        git checkout bump-new-version
-        git stash apply
-        git add --all
-        git commit -m "🔖 Tag: Bump new project version using VersionWise"
-        git push
-
     # If the linter pass
-    - run: echo "The PR has been open! ✅"
+    - run: echo "Version bumped and PR created! ✅"
