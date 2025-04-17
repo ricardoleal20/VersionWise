@@ -29,10 +29,9 @@ jobs:
         name: "Github Actions"
 
     - name: Set up Python 🐍
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: '3.10'
-        cache: 'pip'
 
     - name: Load cached Poetry installation 📦
       uses: actions/cache@v3
@@ -40,17 +39,18 @@ jobs:
         path: ~/.local
         key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
-    - name: Load cached dependencies 📦
+    - name: Load cached venv 📦
+      id: cached-poetry-dependencies
       uses: actions/cache@v3
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
     - name: Install dependencies 🏗️
       run: |
         pip install -Iv poetry==1.8.1
         poetry config virtualenvs.in-project true
-        poetry install
+        poetry install --no-interaction
         poetry run pip install PyGithub
         poetry run pip install maturin
         poetry run maturin develop
