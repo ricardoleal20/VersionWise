@@ -47,10 +47,15 @@ jobs:
 
     - name: Create and switch to bump branch 🔍
       run: |
+        # Fetch all branches and tags
+        git fetch origin
+        
         if git show-ref --verify --quiet refs/remotes/origin/bump-new-version; then
+          # If branch exists, checkout and rebase
           git checkout bump-new-version
-          git pull origin bump-new-version
+          git pull --rebase origin bump-new-version
         else
+          # If branch doesn't exist, create it
           git checkout -b bump-new-version
         fi
         
@@ -60,7 +65,8 @@ jobs:
         git add pyproject.toml
         git add Cargo.toml
         git commit -m "🔖 Bump: Update version and CHANGELOG"
-        git push origin bump-new-version
+        # Try push with --force-with-lease for safety
+        git push --force-with-lease origin bump-new-version
 
     - name: Run Python script for open the PR 🖥️
       run: poetry run python .github/utilities/open_pr.py
