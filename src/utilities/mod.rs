@@ -26,12 +26,12 @@ use toml::Value;
 
 pub fn find_version() -> String {
     // Find the version in the current path
-    let version_path = find_version_in_file();
+    let version_paths = find_version_in_file();
     // Using this, return the version
-    open_path(version_path)
+    open_path(version_paths[0].clone())
 }
 
-pub fn find_version_in_file() -> String {
+pub fn find_version_in_file() -> Vec<String> {
     // Search the `pyproject.toml` in the root folder
     let route = "pyproject.toml";
 
@@ -52,12 +52,14 @@ pub fn find_version_in_file() -> String {
     };
 
     // Search the [tool.sempyver] version path
-    let version_path: String;
+    let mut version_paths: Vec<String> = Vec::new();
     if let Some(tool) = toml_config.get("tool") {
         if let Some(sempyver) = tool.get("sempyver") {
-            if let Some(possible_path) = sempyver.get("version_path") {
-                if let Some(path) = possible_path.get(0) {
-                    version_path = path.to_string().replace("\"", "");
+            if let Some(possible_paths) = sempyver.get("version_path") {
+                if let Some(paths) = possible_paths.as_array() {
+                    for path in paths {
+                        version_paths.push(path.to_string().replace("\"", ""));
+                    }
                 } else {
                     panic!("The version path doesn't include a path");
                 }
@@ -72,11 +74,11 @@ pub fn find_version_in_file() -> String {
     } else {
         panic!("The pyproject doesn't have tools associated. Please add the `sempyver` tool as [tool.sempyver].")
     }
-    if version_path == "" {
-        panic!("Couldn't find the version in the provided path.")
+    if version_paths.is_empty() {
+        panic!("Couldn't find any version paths in the configuration.")
     }
-    // Return the version path
-    version_path
+    // Return the version paths
+    version_paths
 }
 
 pub fn open_path(path: String) -> String {
@@ -118,32 +120,38 @@ pub fn open_path(path: String) -> String {
 }
 
 fn update_version_path(new_version: &str) {
-    // Find the current version path
-    let version_path = find_version_in_file();
-    // Open the file
-    let mut file = match fs::File::open(&version_path) {
-        Ok(file) => file,
-        Err(e) => {
-            panic!("Error opening file {}: {}.", version_path, e);
+    // Find all version paths
+    let version_paths = find_version_in_file();
+    // Get the current version
+    let current_version = find_version();
+
+    // Update each file
+    for version_path in version_paths {
+        // Open the file
+        let mut file = match fs::File::open(&version_path) {
+            Ok(file) => file,
+            Err(e) => {
+                panic!("Error opening file {}: {}.", version_path, e);
+            }
+        };
+        // Read the content as a String
+        let mut content = String::new();
+        if let Err(e) = file.read_to_string(&mut content) {
+            panic!("Error reading file {}: {}.", version_path, e);
         }
-    };
-    // Read the content as a String
-    let mut content = String::new();
-    if let Err(e) = file.read_to_string(&mut content) {
-        panic!("Error reading file {}: {}.", version_path, e);
-    }
-    // Substitute the old version for the new version
-    let updated_content = content.replace(find_version().as_str(), new_version);
-    // Reopen the file but this time as writing mode
-    file = match fs::File::create(&version_path) {
-        Ok(file) => file,
-        Err(e) => {
-            panic!("Error creating file {}: {}.", version_path, e);
+        // Substitute the old version for the new version
+        let updated_content = content.replace(&current_version, new_version);
+        // Reopen the file but this time as writing mode
+        file = match fs::File::create(&version_path) {
+            Ok(file) => file,
+            Err(e) => {
+                panic!("Error creating file {}: {}.", version_path, e);
+            }
+        };
+        // Write the new file
+        if let Err(e) = file.write_all(updated_content.as_bytes()) {
+            panic!("Error writing to file {}: {}.", version_path, e);
         }
-    };
-    // Write the new file
-    if let Err(e) = file.write_all(updated_content.as_bytes()) {
-        panic!("Error writing to file {}: {}.", version_path, e);
     }
 }
 
