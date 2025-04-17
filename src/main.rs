@@ -12,7 +12,7 @@ fn main() {
     // Create the methods
     let (create, list, bump) = create_subcommands();
     // Instance the App
-    let app: App<'_, '_> = App::new("SemPyVer :: Project management with Changesets")
+    let app: App<'_, '_> = App::new("VersionWise :: Project management with Changesets")
         .subcommand(create)
         .subcommand(list)
         .subcommand(bump)
