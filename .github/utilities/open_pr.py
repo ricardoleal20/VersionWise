@@ -83,11 +83,13 @@ def open_pull_request(token: str, repo: str, branch: str) -> None:
     git = Github(token)
     # Get the repo and branch
     git_repo = git.get_repo(repo)
-    git_branch = git_repo.get_branch(branch)
+    # git_branch = git_repo.get_branch(branch)
+
     # Set some default values
     branch_pr = "bump-new-version"
     pr_body = "### 🚀 New Bump\nAutomatically bumping based on latest changesets.\n"
     pr_title = "Bump new project to version v"
+
     # Add the latest CHANGELOG perform
     useful_changelog_changes = "# Changelog\n"
     add_content: bool = False
@@ -104,25 +106,21 @@ def open_pull_request(token: str, repo: str, branch: str) -> None:
             # Add the content ONLY if the add content is True
             if add_content is True:
                 useful_changelog_changes += line
+
     # Update the PR body using this changelog changes
     pr_body += useful_changelog_changes
-    # Check if the reference exists or not
-    try:
-        # Select the exiting repo
-        git_repo.get_branch(branch_pr)
-        branch_exists: bool = True
-    except GithubException:
-        # Create the new reference
-        git_repo.create_git_ref(
-            ref=f"refs/heads/{branch_pr}", sha=git_branch.commit.sha)
-        branch_exists: bool = False
-    # If the branch does not exist...
-    if branch_exists is False:
-        apply_changesets(token, repo, branch_pr)
-        # Create the Pull Request
-        git_repo.create_pull(title=pr_title,
-                             body=pr_body, head=branch_pr, base=branch)
-        print("Pull request created")
+
+    # Check if there's already an open PR for this branch
+    existing_prs = git_repo.get_pulls(
+        state="open", head=f"{git_repo.owner.login}:{branch_pr}"
+    )
+    if existing_prs.totalCount > 0:
+        print("PR already exists for this branch")
+        return
+
+    # Create the Pull Request
+    git_repo.create_pull(title=pr_title, body=pr_body, head=branch_pr, base=branch)
+    print("Pull request created")
 
 
 if __name__ == "__main__":
