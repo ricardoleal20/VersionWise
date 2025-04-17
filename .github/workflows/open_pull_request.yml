@@ -6,7 +6,7 @@ on:
       - main
   # -------------------------------------------------------------------------- #
   # To use this Workflow, you need to specify this line on your job:           #
-  # uses: ricardoleal20/sempyver/.github/workflows/open_pull_request.yml@main  #
+  # uses: ricardoleal20/versionwise/.github/workflows/open_pull_request.yml@main  #
   # -------------------------------------------------------------------------- #
   workflow_call:
 
@@ -43,7 +43,7 @@ jobs:
 
     - name: Perform changeset changes
       run: |
-        poetry run sempyver bump
+        poetry run versionwise bump
 
     - name: Run Python script for open the new branch and the PR 🖥️
       run: poetry run python .github/utilities/open_pr.py
@@ -59,7 +59,7 @@ jobs:
         git checkout bump-new-version
         git stash apply
         git add --all
-        git commit -m "🔖 Tag: Bump new project version using Sempyver"
+        git commit -m "🔖 Tag: Bump new project version using VersionWise"
         git push
 
     # If the linter pass

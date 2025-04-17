@@ -12,14 +12,14 @@ fn main() {
     // Create the methods
     let (create, list, bump) = create_subcommands();
     // Instance the App
-    let app: App<'_, '_> = App::new("SemPyVer :: Project management with Changesets")
+    let app: App<'_, '_> = App::new("VersionWise :: Project management with Changesets")
         .subcommand(create)
         .subcommand(list)
         .subcommand(bump)
         .long_about("This module allows you to easily create and manage changesets for your project, providing a structured approach to documenting and tracking changes throughout the development process. Changesets help teams maintain better control over project updates, ensuring clear communication and effective collaboration. With this tool, you can streamline the process of recording changes, facilitating smoother project management and development workflows.")
         .help("Module for creating and using changesets to manage changes in team projects.
 
-[OPTIONS]
+[Commands]
 \t- `create`: Create a new changeset
 \t- `list`: List the current changes and how they affect the current version
 \t- `bump`: Release the new version and new changelog. Delete all the current changesets."
@@ -46,7 +46,7 @@ fn main() {
             bump_version()
         }
         _ => {
-            // Manejar casos inesperados o mostrar ayuda por defecto
+            // Manage the default cases for this project
             println!("{}", matches.usage());
         }
     }

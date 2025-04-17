@@ -22,26 +22,41 @@ pub fn create_changeset_folder() {
 pub fn write_changeset_file(changeset: &Changeset) {
     // Write the Changeset file from the object obtained
     // First, obtain the file name
-    let filename = format!(".changesets/{}.md", &changeset.name);
+    let filename = format!(".changesets/{}.toml", &changeset.name);
     // Then, start generating the message
-    let mut message = String::new();
+    let mut toml_content = String::new();
 
-    // Initialize the separator
-    let separator = "=".repeat(35) + "\n";
-    // Start adding it a line of 10 `-`
-    message.push_str(&separator);
-    message.push_str(&format!("\t{}:{}\n", &changeset.change, &changeset.tag));
-    message.push_str(&separator);
-    // Write the message and the module, if it exists
-    if !changeset.module.is_empty() {
-        message.push_str(&format!("`{}`: ", &changeset.module));
+    // Write [changeset] section - match the RawChangeset structure
+    toml_content.push_str("[changeset]\n");
+    // Remove any tab character that might be in the change field
+    let clean_change = changeset.change.trim_start().trim_end();
+    toml_content.push_str(&format!("change_type = \"{}\"\n", clean_change));
+    toml_content.push_str(&format!("tag = \"{}\"\n", &changeset.tag));
+    toml_content.push_str(&format!("version = \"{}\"\n", &changeset.version));
+    toml_content.push_str("\n");
+
+    // Write [changes] section - match the RawChangeset structure
+    toml_content.push_str("[changes]\n");
+
+    // Check if modules exists and format as array
+    if !changeset.modules.is_empty() {
+        toml_content.push_str(&format!(
+            "modules = [\"{}\"]",
+            &changeset.modules.replace(", ", "\", \"")
+        ));
+    } else {
+        toml_content.push_str("modules = []");
     }
-    message.push_str(&changeset.message);
-    // Then, create of the file
+    toml_content.push_str("\n");
+
+    // Add description (matches the RawChangeset structure)
+    toml_content.push_str(&format!("description = \"{}\"\n", &changeset.message));
+
+    // Then, create the file
     let file: Result<fs::File, std::io::Error> = fs::File::create(filename);
 
     match file {
-        Ok(mut file) => match file.write_all(message.as_bytes()) {
+        Ok(mut file) => match file.write_all(toml_content.as_bytes()) {
             Ok(_) => {}
             Err(_) => {
                 panic!("There's an error writing the changeset.")
