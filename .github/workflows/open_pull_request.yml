@@ -64,21 +64,26 @@ jobs:
         # Fetch all branches and tags
         git fetch origin
         
-        if git show-ref --verify --quiet refs/remotes/origin/bump-new-version; then
-          # If branch exists, checkout and rebase
-          git checkout bump-new-version
-          git pull --rebase origin bump-new-version
-        else
-          # If branch doesn't exist, create it
-          git checkout -b bump-new-version
-        fi
-        
+        # Configure git user
         git config --global user.email "github-actions@github.com"
         git config --global user.name "GitHub Actions"
+        
+        # Make changes and commit them in the current branch first
         git add CHANGELOG.md
         git add pyproject.toml
         git add Cargo.toml
         git commit -m "🔖 Bump: Update version and CHANGELOG"
+        
+        if git show-ref --verify --quiet refs/remotes/origin/bump-new-version; then
+          # If branch exists, checkout and rebase
+          git checkout bump-new-version
+          git reset --hard origin/bump-new-version
+          git cherry-pick main
+        else
+          # If branch doesn't exist, create it from current commit
+          git checkout -b bump-new-version
+        fi
+        
         # Try push with --force-with-lease for safety
         git push --force-with-lease origin bump-new-version
 
