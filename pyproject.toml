@@ -7,7 +7,7 @@ readme = "README.md"
 version = "0.0.0"
 
 [tool.poetry.dependencies]
-python = ">=3.7"
+python = ">=3.9"
 maturin = ">=1.5.1"
 
 [tool.versionwise]
@@ -20,12 +20,12 @@ build-backend = "maturin"
 
 [project]
 name = "versionwise"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Topic :: Software Management :: Management Tools",
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = ["maturin>=1.5.1 ; python_version>'3.8'"]
+dependencies = ["maturin>=1.5.1 ; python_version>'3.9'"]
 dynamic = ["authors", "description", "license", "readme", "version"]

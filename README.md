@@ -18,7 +18,7 @@ To install `VersionWise`, you can do it through pip:
 pip install versionwise
 ```
 
-Please consider that it requires `Python >=3.8`
+Please consider that it requires `Python >=3.9`
 
 ## Usage
 
