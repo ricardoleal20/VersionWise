@@ -1,4 +1,4 @@
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use std::env;
 /// AI-based message generator for changesets
 /// This module provides functionality to generate changeset messages
