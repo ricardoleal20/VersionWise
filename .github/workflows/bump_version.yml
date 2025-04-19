@@ -6,7 +6,7 @@ on:
       - main
   # -------------------------------------------------------------------------- #
   # To use this Workflow, you need to specify this line on your job:           #
-  # uses: ricardoleal20/versionwise/.github/workflows/open_pull_request.yml@main  #
+  # uses: ricardoleal20/versionwise/.github/workflows/bump_version.yml@main    #
   # -------------------------------------------------------------------------- #
   workflow_call:
 
@@ -14,6 +14,7 @@ on:
 jobs:
   # Name of the main job for this
   bump_and_open_pr:
+    name: Bump new version 🔖
     runs-on: ubuntu-latest
 
     steps:
