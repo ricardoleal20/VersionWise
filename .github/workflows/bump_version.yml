@@ -69,23 +69,27 @@ jobs:
         git config --global user.email "github-actions@github.com"
         git config --global user.name "GitHub Actions"
 
-        if git show-ref --verify --quiet refs/remotes/origin/bump-new-version; then
-          # Stash the changes
-          git stash
-          # If branch exists, checkout and reset
-          git checkout bump-new-version
-          git stash show -p | git apply && git stash drop
-        else
-          # If branch doesn't exist, create it from current state
-          git checkout -b bump-new-version
-        fi
+        # Create a fresh branch from main
+        git checkout main
+        git pull origin main
+        
+        # Create bump branch and force it to be exactly like main
+        git branch -D bump-new-version || true
+        git checkout -b bump-new-version
+        git reset --hard origin/main
+
+        # Now apply the version bump on the clean state
+        poetry run versionwise bump
 
         # Stage and commit changes
         git add --all
-        git commit -m "🔖 Bump: Update version and CHANGELOG"
-        
-        # Try push with --force-with-lease for safety
-        git push --force-with-lease origin bump-new-version
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "🔖 Bump: Update version and CHANGELOG"
+          # Force push the new state
+          git push -f origin bump-new-version
+        fi
 
     - name: Run Python script for open the PR 🖥️
       run: poetry run python .github/utilities/open_pr.py
