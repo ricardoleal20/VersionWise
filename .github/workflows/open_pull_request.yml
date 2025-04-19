@@ -67,30 +67,20 @@ jobs:
         # Configure git user
         git config --global user.email "github-actions@github.com"
         git config --global user.name "GitHub Actions"
-        
-        # Store current changes
-        TEMP_CHANGELOG=$(cat CHANGELOG.md)
-        TEMP_PYPROJECT=$(cat pyproject.toml)
-        TEMP_CARGO=$(cat Cargo.toml)
-        
+
         if git show-ref --verify --quiet refs/remotes/origin/bump-new-version; then
+          # Stash the changes
+          git stash
           # If branch exists, checkout and reset
           git checkout bump-new-version
-          git reset --hard origin/bump-new-version
-          
-          # Apply stored changes
-          echo "$TEMP_CHANGELOG" > CHANGELOG.md
-          echo "$TEMP_PYPROJECT" > pyproject.toml
-          echo "$TEMP_CARGO" > Cargo.toml
+          git stash show -p | git apply && git stash drop
         else
           # If branch doesn't exist, create it from current state
           git checkout -b bump-new-version
         fi
-        
+
         # Stage and commit changes
-        git add CHANGELOG.md
-        git add pyproject.toml
-        git add Cargo.toml
+        git add --all
         git commit -m "🔖 Bump: Update version and CHANGELOG"
         
         # Try push with --force-with-lease for safety
