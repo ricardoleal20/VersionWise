@@ -33,7 +33,7 @@ pub fn list_changesets() {
                 .filter(|c| c.change.trim() == change_type && c.tag == changeset.tag)
             {
                 // If this changeset has a module, include it. If not, then just don't
-                if nested_changeset.modules == "" {
+                if nested_changeset.modules.is_empty() {
                     println!("    - {}", nested_changeset.message);
                 } else {
                     println!(

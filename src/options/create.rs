@@ -14,7 +14,6 @@ use requestty::{prompt, prompt_one, Answer, Question};
 use std::fs;
 use std::path::Path;
 use std::process::Command;
-use tokio;
 // Local imports
 use crate::options::Changeset;
 use crate::utilities::{
@@ -86,7 +85,7 @@ fn get_git_changed_files() -> Vec<String> {
 
     // Try to get modified files from git
     let output = Command::new("git")
-        .args(&["diff", "--name-only", "HEAD"])
+        .args(["diff", "--name-only", "HEAD"])
         .output();
 
     if let Ok(output) = output {
@@ -159,7 +158,7 @@ fn set_tag(change_type: &str) -> String {
     let mut tag = result.as_list_item().unwrap().text.as_str();
     // And now, clean the tag
     let re = Regex::new(r"([A-Za-z]+):").unwrap();
-    if let Some(capture) = re.captures(&tag) {
+    if let Some(capture) = re.captures(tag) {
         if let Some(matched) = capture.get(1) {
             tag = matched.as_str();
         }

@@ -67,7 +67,7 @@ impl AIConfig {
 /// or None if the file isn't tracked or there's no git repository.
 pub fn get_git_diff(file_path: &str) -> Option<String> {
     let output = Command::new("git")
-        .args(&["diff", "HEAD", file_path])
+        .args(["diff", "HEAD", file_path])
         .output()
         .ok()?;
 
@@ -80,7 +80,7 @@ pub fn get_git_diff(file_path: &str) -> Option<String> {
 
     // If we didn't get a diff from HEAD, try to get from staging
     let output = Command::new("git")
-        .args(&["diff", "--staged", file_path])
+        .args(["diff", "--staged", file_path])
         .output()
         .ok()?;
 

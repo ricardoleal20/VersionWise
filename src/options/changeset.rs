@@ -1,22 +1,22 @@
 /// Just write the Changeset structure
 use std::cmp::Ordering;
 
-fn update_version(change: &String, version: String) -> String {
+fn update_version(change: &str, version: String) -> String {
     let mut new_version = String::new();
     // We're going to update the version based on the change type
-    match change.as_str() {
-        "MAJOR" => new_version = format!("{}.0.0", version.split('.').nth(0).unwrap()),
+    match change {
+        "MAJOR" => new_version = format!("{}.0.0", version.split('.').next().unwrap()),
         "MINOR" => {
             new_version = format!(
                 "{}.{}.0",
-                version.split('.').nth(0).unwrap(),
+                version.split('.').next().unwrap(),
                 version.split('.').nth(1).unwrap()
             )
         }
         "PATCH" => {
             new_version = format!(
                 "{}.{}.{}",
-                version.split('.').nth(0).unwrap(),
+                version.split('.').next().unwrap(),
                 version.split('.').nth(1).unwrap(),
                 version.split('.').nth(2).unwrap()
             )

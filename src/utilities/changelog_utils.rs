@@ -14,30 +14,31 @@ pub fn open_changelog() -> Vec<String> {
 
     // Create the content structure
     let mut content: Vec<String> = Vec::new();
-    for line in reader.lines() {
+
+    reader.lines().for_each(|line| {
         if let Ok(line_content) = line {
             content.push(line_content);
         }
-    }
+    });
     // And return it
     content
 }
 
-pub fn create_changelog(content: Vec<String>, version: &String) {
+pub fn create_changelog(content: Vec<String>, version: &str) {
     // Create a new CHANGELOG.md file
     let mut file = fs::File::create("CHANGELOG.md").expect("Error creating the CHANGELOG.md");
 
     // Write the entire CHANGELOG content
     writeln!(file, "{}", content.join("\n")).expect("Error when writing the CHANGELOG.md");
     // Write the new version file too
-    update_version_path(version.as_str());
+    update_version_path(version);
     // Delete all the current changesets
     delete_changesets();
     // If everything's cool, then write the successful message
     println!("The `CHANGELOG.md` and version has been updated!");
 }
 
-pub fn new_changelog_entry(changesets: &Vec<Changeset>, version: &String) -> Vec<String> {
+pub fn new_changelog_entry(changesets: &[Changeset], version: &String) -> Vec<String> {
     // Update the version based on the latest
     // First, get a list of printed tags to avoid read the same tag twice
     let mut printed_tags: HashSet<&String> = HashSet::new();
@@ -54,7 +55,7 @@ pub fn new_changelog_entry(changesets: &Vec<Changeset>, version: &String) -> Vec
         // Filter for all the same tags
         for nested_changeset in changesets.iter().filter(|c| c.tag == changeset.tag) {
             // Then, write all the changes
-            if nested_changeset.modules == "" {
+            if nested_changeset.modules.is_empty() {
                 content.push(format!("- {}.\n", nested_changeset.message));
             } else {
                 content.push(format!(

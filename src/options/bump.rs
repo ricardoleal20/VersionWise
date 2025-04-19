@@ -22,7 +22,7 @@ pub fn bump_version() {
         .position(|line| line.starts_with("## ["))
         .unwrap_or(content.len());
     //content_to_write.truncate(content_to_write.len() - 2);
-    content.insert(start_of_versions_index, format!("{}", new_entry.join("")));
+    content.insert(start_of_versions_index, new_entry.join("").to_string());
     // Then, by last, write the content
     create_changelog(content, &new_version)
 }
