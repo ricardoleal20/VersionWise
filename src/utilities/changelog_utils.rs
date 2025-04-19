@@ -76,16 +76,14 @@ fn delete_changesets() {
     // Verify if the folder exist
     if let Ok(entries) = fs::read_dir(folder_path) {
         // Iterate over all the changesets in that folder
-        for entry in entries {
-            if let Ok(entry) = entry {
-                let path = entry.path();
-                // For security, verify if the entry is a file
-                if path.is_file() {
-                    // Try to remove the file
-                    if let Err(e) = fs::remove_file(&path) {
-                        // If you could not delete a file, then panic
-                        panic!("Error deleting file {}: {}", path.display(), e);
-                    }
+        for entry in entries.flatten() {
+            let path = entry.path();
+            // For security, verify if the entry is a file
+            if path.is_file() {
+                // Try to remove the file
+                if let Err(e) = fs::remove_file(&path) {
+                    // If you could not delete a file, then panic
+                    panic!("Error deleting file {}: {}", path.display(), e);
                 }
             }
         }

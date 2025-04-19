@@ -71,7 +71,7 @@ pub fn get_current_changesets() -> Vec<Changeset> {
             let file_name = dir_entry.file_name();
             let file_path = &dir_entry.path();
             // Process. if the filepath is a file and it's extension is .toml, then process
-            if file_path.is_file() && file_path.extension().map_or(false, |ext| ext == "toml") {
+            if file_path.is_file() && file_path.extension().is_some_and(|ext| ext == "toml") {
                 match process_file(file_name.to_str().unwrap()) {
                     Ok(changeset) => {
                         changesets.push(changeset);

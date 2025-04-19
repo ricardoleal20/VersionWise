@@ -7,7 +7,7 @@ use crate::options::Changeset;
 /// Create the changeset directory on the root project
 pub fn create_changeset_folder() {
     // Check to see if the folder `.changesets` exists
-    if !fs::metadata(".changesets/").is_ok() {
+    if fs::metadata(".changesets/").is_err() {
         // If it doesn't exist, create it
         match fs::create_dir(".changesets/") {
             Ok(_) => {}
@@ -33,7 +33,7 @@ pub fn write_changeset_file(changeset: &Changeset) {
     toml_content.push_str(&format!("change_type = \"{}\"\n", clean_change));
     toml_content.push_str(&format!("tag = \"{}\"\n", &changeset.tag));
     toml_content.push_str(&format!("version = \"{}\"\n", &changeset.version));
-    toml_content.push_str("\n");
+    toml_content.push('\n');
 
     // Write [changes] section - match the RawChangeset structure
     toml_content.push_str("[changes]\n");
@@ -47,7 +47,7 @@ pub fn write_changeset_file(changeset: &Changeset) {
     } else {
         toml_content.push_str("modules = []");
     }
-    toml_content.push_str("\n");
+    toml_content.push('\n');
 
     // Add description (matches the RawChangeset structure)
     toml_content.push_str(&format!("description = \"{}\"\n", &changeset.message));
