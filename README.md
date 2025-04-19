@@ -1,14 +1,14 @@
 <p align="center">
-    <img src="https://github.com/ricardoleal20/VersionWise/blob/main/docs/img/logo.png" />
+    <img src="https://github.com/ricardoleal20/VersionWise/blob/main/docs/img/logo.png" width="50%" height="50%" />
 </p>
 <p align="center">
     <b>Tool for teams that manage the creation and modification of the </b>CHANGELOG<b> based on a specified set of changes.</b>
 </p>
 
-![PyPi version](https://img.shields.io/pypi/v/versionwise?label=PyPi%20version&logo=PyPi&style=for-the-badge)
+<!-- ![PyPi version](https://img.shields.io/pypi/v/versionwise?label=PyPi%20version&logo=PyPi&style=for-the-badge)
 ![Python versions supported](https://img.shields.io/pypi/pyversions/versionwise?label=Python%20Versions%20Supported&logo=Python&style=for-the-badge)
 ![Deployed](https://img.shields.io/github/actions/workflow/status/ricardoleal20/versionwise/.github/workflows/publish_on_release.yml?branch=main&label=LAST%20VERSION%20DEPLOYED%20%F0%9F%9A%80&logo=Github&style=for-the-badge)
-![License](https://img.shields.io/github/license/ricardoleal20/versionwise?color=%23808000&label=%F0%9F%93%84%20LICENSE&style=for-the-badge)
+![License](https://img.shields.io/github/license/ricardoleal20/versionwise?color=%23808000&label=%F0%9F%93%84%20LICENSE&style=for-the-badge) -->
 
 ## Installation
 
