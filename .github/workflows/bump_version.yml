@@ -56,10 +56,6 @@ jobs:
         poetry run pip install maturin
         poetry run maturin develop
 
-    - name: Perform version bump 🔖
-      run: |
-        poetry run versionwise bump
-
     - name: Create and switch to bump branch 🔍
       run: |
         # Fetch all branches and tags

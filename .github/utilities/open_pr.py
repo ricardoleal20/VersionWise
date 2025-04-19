@@ -3,10 +3,30 @@ Open a Pull Request for the latest versions bumped on the
 main branch.
 """
 import os
-from typing import Optional
+import re
+from typing import Optional, List
 # Import the Github token
 from github import Github, InputGitTreeElement
-from github.GithubException import GithubException
+
+
+def get_codeowners() -> List[str]:
+    """Get the list of CODEOWNERS from the CODEOWNERS file."""
+    codeowners = []
+    codeowners_paths = [".github/CODEOWNERS", "docs/CODEOWNERS", "CODEOWNERS"]
+
+    for path in codeowners_paths:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                for line in f:
+                    # Skip comments and empty lines
+                    if line.strip() and not line.startswith("#"):
+                        # Extract usernames (those starting with @)
+                        owners = re.findall(r"@(\w+)", line)
+                        codeowners.extend(owners)
+
+    # Remove duplicates while preserving order
+    return list(dict.fromkeys(codeowners))
+
 
 def get_all_file_paths(
     relative_path: str,
@@ -119,7 +139,17 @@ def open_pull_request(token: str, repo: str, branch: str) -> None:
         return
 
     # Create the Pull Request
-    git_repo.create_pull(title=pr_title, body=pr_body, head=branch_pr, base=branch)
+    pr = git_repo.create_pull(title=pr_title, body=pr_body, head=branch_pr, base=branch)
+
+    # Get CODEOWNERS and add them as reviewers
+    try:
+        codeowners = get_codeowners()
+        if codeowners:
+            pr.create_review_request(reviewers=codeowners)
+            print(f"Added {len(codeowners)} CODEOWNERS as reviewers")
+    except Exception as e:
+        print(f"Failed to add CODEOWNERS as reviewers: {str(e)}")
+
     print("Pull request created")
 
 
